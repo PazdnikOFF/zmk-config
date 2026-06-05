@@ -103,7 +103,7 @@
             bindings = <
 &kp ESC   &none      &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &none
 &kp TAB   &kp LG(S)  &kp LG(A)             &kp LG(O)             &kt LG(P)               &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &none
-&kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)               &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &none
+&kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)               &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp LC(SPACE)
                                            &none                 &none                   &kp BSPC       &kp ENTER
             >;
         };

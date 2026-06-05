@@ -49,10 +49,10 @@
 
         default_layer {
             bindings = <
-&kp Q  &kp W  &kp E  &kp R    &kp T       &kp Y    &kp U    &kp I     &kp O    &kp P
-&kp A  &kp S  &kp D  &kp F    &kp G       &kp H    &kp J    &kp K     &kp L    &kp SEMI
-&kp Z  &kp X  &kp C  &kp V    &kp B       &kp N    &kp M    &kp CMMA  &kp DOT  &kp SLASH
-                     &mo FNC  &kp LSFT    &kp SPC  &mo SYM
+&kp Q  &kp W  &kp E  &kp R    &kp T        &kp Y           &kp U    &kp I      &kp O    &kp P
+&kp A  &kp S  &kp D  &kp F    &kp G        &kp H           &kp J    &kp K      &kp L    &kp SEMI
+&kp Z  &kp X  &kp C  &kp V    &kp B        &kp N           &kp M    &kp COMMA  &kp DOT  &kp SLASH
+                     &mo FNC  &kp SPACE    &kp LEFT_SHIFT  &mo SYM
             >;
         };
 
@@ -66,10 +66,10 @@
 
         sym_layer {
             bindings = <
-&kp NUM_1  &kp NUM_2  &kp NUM_3  &kp NUM_4  &kp NUM_5    &kp NUM_6  &kp NUM_7  &kp NUM_8  &kp NUM_9  &kp NUM_0
-&kp HASH   &kp UNDER  &kp LPAR   &kp LBKT   &kp LBRC     &kp EQUAL  &kp QMARK  &kp SQT    &kp PLUS   &kp STAR
-&kp DLLR   &kp AMPS   &kp RPAR   &kp RBKT   &kp RBRC     &kp AT     &kp EXCL   &kp DQT    &kp MINUS  &kp SLASH
-                                 &none      &kp LGUI     &none      &none
+&kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+&kp HASH      &kp UNDER     &kp LPAR      &kp LBKT      &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
+&kp DLLR      &kp AMPS      &kp RPAR      &kp RBKT      &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
+                                          &none         &kp LGUI    &none         &none
             >;
         };
 
@@ -122,6 +122,15 @@
 &kp LA(LS(A))  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))    &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none
 &kp F11        &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &none
                                              &none          &none            &none              &none
+            >;
+        };
+
+        layer_5 {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+                        &trans  &trans    &trans  &trans
             >;
         };
     };

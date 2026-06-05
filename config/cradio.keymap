@@ -66,10 +66,10 @@
 
         sym_layer {
             bindings = <
-&kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-&kp HASH      &kp UNDER     &kp LPAR      &kp LBKT      &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
-&kp DLLR      &kp AMPS      &kp RPAR      &kp RBKT      &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
-                                          &none         &kp LGUI    &none         &none
+&kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+&kp HASH      &kp UNDER     &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
+&kp DLLR      &kp AMPS      &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
+                                          &kp LC(SPACE)  &kp LGUI    &none         &none
             >;
         };
 
@@ -101,7 +101,7 @@
 
         fnc_layer {
             bindings = <
-&kp ESC   &none      &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &none
+&kp ESC   &none      &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &kp LG(Q)
 &kp TAB   &kp LG(S)  &kp LG(A)             &kp LG(O)             &kt LG(P)               &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &none
 &kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)               &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp LC(SPACE)
                                            &none                 &none                   &kp BSPC       &kp ENTER

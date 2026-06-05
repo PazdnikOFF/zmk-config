@@ -26,13 +26,13 @@
         combo_sym2 {
             timeout-ms = <50>;
             key-positions = <32 33>;
-            bindings = <&tog SYM_2>;
+            bindings = <&tog 2>;
         };
 
         combo_fun2 {
             timeout-ms = <50>;
             key-positions = <30 31>;
-            bindings = <&tog FNC_2>;
+            bindings = <&tog 4>;
         };
     };
 
@@ -49,10 +49,10 @@
 
         default_layer {
             bindings = <
-&kp Q  &kp W  &kp E  &kp R    &kp T        &kp Y           &kp U    &kp I      &kp O    &kp P
-&kp A  &kp S  &kp D  &kp F    &kp G        &kp H           &kp J    &kp K      &kp L    &kp SEMI
-&kp Z  &kp X  &kp C  &kp V    &kp B        &kp N           &kp M    &kp COMMA  &kp DOT  &kp SLASH
-                     &mo FNC  &kp SPACE    &kp LEFT_SHIFT  &mo SYM
+&kp Q  &kp W  &kp E  &kp R  &kp T        &kp Y           &kp U  &kp I      &kp O    &kp P
+&kp A  &kp S  &kp D  &kp F  &kp G        &kp H           &kp J  &kp K      &kp L    &kp SEMI
+&kp Z  &kp X  &kp C  &kp V  &kp B        &kp N           &kp M  &kp COMMA  &kp DOT  &kp SLASH
+                     &mo 3  &kp SPACE    &kp LEFT_SHIFT  &mo 1
             >;
         };
 
@@ -101,7 +101,7 @@
 
         fnc_layer {
             bindings = <
-&kp ESC   &none      &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &kp LG(Q)
+&kp ESC   &kp LG(R)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &kp LG(Q)
 &kp TAB   &kp LG(S)  &kp LG(A)             &kp LG(O)             &kt LG(P)               &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &none
 &kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)               &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp LC(SPACE)
                                            &none                 &none                   &kp BSPC       &kp ENTER
@@ -122,15 +122,6 @@
 &kp LA(LS(A))  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))    &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none
 &kp F11        &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &none
                                              &none          &none            &none              &none
-            >;
-        };
-
-        layer_5 {
-            bindings = <
-&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
-                        &trans  &trans    &trans  &trans
             >;
         };
     };

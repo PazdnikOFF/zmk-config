@@ -120,7 +120,7 @@
             bindings = <
 &kp F1         &kp F2         &kp F3         &kp F4         &kp F5           &kp F6             &kp F7             &kp F8             &kp F9             &kp F10
 &kp LA(LS(A))  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))    &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none
-&kp F11        &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &none
+&kp F11        &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &kp LG(BACKSPACE)
                                              &none          &none            &none              &none
             >;
         };

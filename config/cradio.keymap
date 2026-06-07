@@ -85,7 +85,7 @@
             bindings = <
 &kp GRAVE  &kp BSLH   &kp PRCNT  &none  &none    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
 &kp TILDE  &kp PIPE   &kp CARET  &none  &none    &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &none         &bt BT_CLR
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &none  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp C_NEXT       &none         &studio_unlock
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &none  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &none         &studio_unlock
                                  &none  &none    &none              &none
             >;
         };
@@ -101,7 +101,7 @@
 
         fnc_layer {
             bindings = <
-&kp ESC   &none      &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &kp LG(Q)
+&kp ESC   &kp LG(F)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)    &kp LC(LEFT)   &kp LC(DOWN)      &kp LC(UP)        &kp LC(RIGHT)   &kp LG(Q)
 &kp TAB   &kp LG(S)  &kp LG(A)             &kp LG(O)             &kt LG(P)    &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &kp BACKSPACE
 &kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)    &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
                                            &none                 &none        &kp BSPC       &kp ENTER

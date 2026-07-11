@@ -34,6 +34,11 @@
             key-positions = <30 31>;
             bindings = <&tog 4>;
         };
+
+        lol {
+            bindings = <&tog 5>;
+            key-positions = <30 33>;
+        };
     };
 
     keymap {
@@ -122,6 +127,15 @@
 &kp LG(Q)  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))    &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none
 &kp F11    &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &kp LG(BACKSPACE)
                                          &none          &none            &none              &none
+            >;
+        };
+
+        layer_5 {
+            bindings = <
+&kp Q      &kp W         &kp E   &kp R    &kp T             &trans  &trans  &trans  &trans  &trans
+&kp A      &kp S         &kp D   &kp F    &kp G             &trans  &trans  &trans  &trans  &trans
+&kp LCTRL  &kp LEFT_ALT  &trans  &trans   &kp LEFT_SHIFT    &trans  &trans  &trans  &trans  &trans
+                                 &kp TAB  &kp SPACE         &trans  &trans
             >;
         };
     };

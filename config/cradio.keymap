@@ -20,6 +20,16 @@
 };
 
 / {
+    behaviors {
+        dc: dot_comma {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <1000>;
+            flavor = "tap-preferred";
+            bindings = <&kp>, <&kp>;
+        };
+    };
+
     combos {
         compatible = "zmk,combos";
 
@@ -40,7 +50,7 @@
         compatible = "zmk,keymap";
 
         /*
-  
+
  | Q | W | E | R | T |       | Y | U | I | O | P |
  | A | S | D | F | G |       | H | J | K | L | ;: |
  | Z | X | C | V | B |       | N | M | ,< | .> | /? |
@@ -57,7 +67,7 @@
         };
 
         /*
-  
+
  | 1 | 2 | 3 | 4 | 5 |       | 6 | 7 | 8 | 9 | 0 |
  | # | _ | ( | [ | { |       | = | ? | ' | + | * |
  | $ | & | ) | ] | } |       | @ | ! | " | - | / |
@@ -66,15 +76,15 @@
 
         sym_layer {
             bindings = <
-&kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-&kp HASH      &kp UNDER     &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
-&kp DLLR      &kp AMPS      &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
-                                          &kp LC(SPACE)  &kp LGUI    &none         &none
+&kp NUMBER_1  &kp NUMBER_2     &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+&kp HASH      &kp UNDER        &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
+&kp DLLR      &dc CARET AMPS   &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
+                                             &kp LC(SPACE)  &kp LGUI    &none         &none
             >;
         };
 
         /*
-  
+
  | ` | \ | % |   |   |       |   |   |   |   |   |
  | ~ | | | ^ |   |   |       |   |   |   |   |   |
  |   |   |   |   |   |       |   |   |   |   |   |
@@ -91,7 +101,7 @@
         };
 
         /*
-  
+
  | ESC |   |   |   |   |           |   |   |   |   |   |
  | TAB |   |   |   |   |           | h | j | k | l |   |
  | CAP |   |   |   |   |           |   |   |   |   |   |
@@ -109,7 +119,7 @@
         };
 
         /*
-  
+
  | F1 | F2 | F3 | F4 | F5 |           | F6 | F7 | F8 | F9 | F10 |
  |   |   |   |   |   |           |   |   |   |   |   |
  | F11 | F12 |   |   |   |           |   |   |   |   |   |

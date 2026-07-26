@@ -24,7 +24,7 @@
         dc: dot_comma {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            tapping-term-ms = <1000>;
+            tapping-term-ms = <300>;
             flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
         };
@@ -78,7 +78,7 @@
             bindings = <
 &kp NUMBER_1  &kp NUMBER_2     &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
 &kp HASH      &kp UNDER        &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
-&kp DLLR      &dc LS(SLASH) AMPS   &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
+&kp DLLR      &dc LS(NUMBER_7) AMPS   &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
                                              &kp LC(SPACE)  &kp LGUI    &none         &none
             >;
         };

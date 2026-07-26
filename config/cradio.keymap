@@ -59,8 +59,8 @@
 
         default_layer {
             bindings = <
-&kp Q  &kp W  &kp E  &kp R  &kp T        &kp Y           &kp U  &kp I      &kp O    &kp P
-&kp A  &kp S  &kp D  &kp F  &kp G        &kp H           &kp J  &kp K      &kp L    &kp SEMI
+&kp Q  &kp W  &kp E  &kp R  &kp T        &kp Y           &kp U  &kp I      &kp O    &dc LBKT P
+&kp A  &kp S  &kp D  &kp F  &kp G        &kp H           &kp J  &kp K      &kp L    &dc SQT SEMI
 &kp Z  &kp X  &kp C  &kp V  &kp B        &kp N           &kp M  &kp COMMA  &kp DOT  &kp SLASH
                      &mo 3  &kp SPACE    &kp LEFT_SHIFT  &mo 1
             >;
@@ -78,7 +78,7 @@
             bindings = <
 &kp NUMBER_1  &kp NUMBER_2     &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
 &kp HASH      &kp UNDER        &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
-&kp DLLR      &dc CARET AMPS   &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
+&kp DLLR      &dc LS(SLASH) AMPS   &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
                                              &kp LC(SPACE)  &kp LGUI    &none         &none
             >;
         };

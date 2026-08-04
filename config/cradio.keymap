@@ -112,7 +112,7 @@
         fnc_layer {
             bindings = <
 &kp ESC   &kp LG(P)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)    &kp LG(LEFT)   &kp LG(DOWN)      &kp LG(UP)        &kp LG(RIGHT)   &kp LG(Q)
-&kp TAB   &kp LG(S)  &kp LG(A)             &kp LG(O)             &kp LG(F)    &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &kp BACKSPACE
+&kp TAB   &kp LG(A)  &kp LG(S)             &kp LG(O)             &kp LG(F)    &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &kp BACKSPACE
 &kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)    &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
                                            &none                 &none        &kp BSPC       &kp ENTER
             >;

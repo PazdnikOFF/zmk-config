@@ -23,6 +23,26 @@ config SWEEP_DONGLE_HOST_LINK_GATT
       Работает и на батарее: сервис висит на том же BLE-соединении, которым
       донгл отдаёт HID хосту. Запись требует шифрования, то есть сопряжения.
 
+config SWEEP_DONGLE_IDLE_SPLIT_INT
+    int "Интервал сплит-линков на простое, единицы по 1.25 мс"
+    depends on ZMK_SPLIT_ROLE_CENTRAL
+    default 800
+    range 6 3200
+    help
+      800 единиц это ровно секунда. Центральный обязан дежурить на каждом
+      событии соединения, поэтому растянутый интервал — самая крупная
+      экономия из доступных. Цена: первое нажатие после простоя доедет с
+      задержкой до одного интервала, дальше скорость обычная.
+
+config SWEEP_DONGLE_IDLE_SPLIT_TIMEOUT
+    int "Таймаут соединения на простое, единицы по 10 мс"
+    depends on ZMK_SPLIT_ROLE_CENTRAL
+    default 600
+    range 10 3200
+    help
+      Должен превышать удвоенный интервал простоя, иначе связь развалится.
+      Проверяется BUILD_ASSERT в power.c.
+
 config SWEEP_DONGLE_HOST_LINK_STARTUP_DELAY_MS
     int "Задержка перед включением приёма из CDC, мс"
     depends on SWEEP_DONGLE_HOST_LINK_CDC

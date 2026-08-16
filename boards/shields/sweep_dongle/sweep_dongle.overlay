@@ -1,0 +1,118 @@
+/*
+ * Донгл: nice!nano v2 + WeAct Studio 1.54" e-paper (SSD1681, 200x200).
+ *
+ * Распиновка выбрана так, чтобы не трогать NFC-выводы P0.09 (D10) и
+ * P0.10 (D16): CONFIG_NFCT_PINS_AS_GPIO в дереве ZMK нигде не включается,
+ * поэтому как GPIO они недоступны. Штатный spi1_default у nice!nano как раз
+ * сажает MOSI на P0.10 — ниже он переопределяется.
+ *
+ *   SCL  (SCK)  -> D15  P1.13
+ *   SDA  (MOSI) -> D14  P1.11   (штатный MISO; SSD1681 ничего не отдаёт)
+ *   CS          -> D2   P0.17
+ *   D/C         -> D3   P0.20
+ *   RES         -> D4   P0.22
+ *   BUSY        -> D5   P0.24
+ *   VCC         -> VCC (3.3 В, за ключом EXT_POWER на P0.13)
+ *   GND         -> GND
+ */
+
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    chosen {
+        zmk,kscan = &dummy_kscan;
+        zmk,matrix-transform = &default_transform;
+        zephyr,display = &epaper;
+    };
+
+    /*
+     * Донгл — central, раскладка исполняется здесь, поэтому нужна карта на все
+     * 34 позиции Sweep. Половинки присылают уже готовые глобальные позиции
+     * (правая — со сдвигом col-offset = 17), так что карта совпадает с
+     * cradio.dtsi один в один.
+     */
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
+        columns = <34>;
+        rows = <1>;
+        map = <
+        RC(0,0)  RC(0,1)  RC(0,2)  RC(0,3)  RC(0,4)    RC(0,21) RC(0,20) RC(0,19) RC(0,18) RC(0,17)
+        RC(0,5)  RC(0,6)  RC(0,7)  RC(0,8)  RC(0,9)    RC(0,26) RC(0,25) RC(0,24) RC(0,23) RC(0,22)
+        RC(0,10) RC(0,11) RC(0,12) RC(0,13) RC(0,14)   RC(0,31) RC(0,30) RC(0,29) RC(0,28) RC(0,27)
+                                   RC(0,15) RC(0,16)   RC(0,33) RC(0,32)
+        >;
+    };
+
+    /*
+     * Клавиш у донгла нет, но ZMK требует kscan. zmk,kscan-mock не подходит:
+     * без свойства events он не собирается (DT_N_S_kscan_P_events_LEN), а
+     * задержку события в нём кодируют 15 бит — дольше 32.7 с не отложить.
+     * Поэтому обычный direct-драйвер на один физически не разведённый вывод:
+     * подтяжка вверх, событий не будет никогда.
+     */
+    dummy_kscan: kscan {
+        compatible = "zmk,kscan-gpio-direct";
+        input-gpios = <&pro_micro 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+};
+
+&pinctrl {
+    /* Переопределяем штатный spi1: MOSI уводим с NFC-пина P0.10 на P1.11,
+       MISO не заявляем вообще — панель однонаправленная. */
+    spi1_default: spi1_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,
+                    <NRF_PSEL(SPIM_MOSI, 1, 11)>;
+        };
+    };
+
+    spi1_sleep: spi1_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,
+                    <NRF_PSEL(SPIM_MOSI, 1, 11)>;
+            low-power-enable;
+        };
+    };
+};
+
+&spi1 {
+    status = "okay";
+    cs-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+
+    epaper: ssd1681@0 {
+        compatible = "solomon,ssd1681";
+        reg = <0>;
+        spi-max-frequency = <4000000>;
+        width = <200>;
+        height = <200>;
+
+        dc-gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
+        reset-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>;
+        busy-gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+
+        tssv = <0x80>;
+
+        /* Модуль стоит развёрнутым. Свойство меняет scan_mode драйвера с
+           XDYIY на XIYDY, то есть направления обеих осей сразу — это поворот
+           на 180°, а не зеркало. */
+        orientation-flipped;
+
+        /* Профили обновления. Партиал в драйвере ssd16xx выключен,
+           пока нет узла partial — даже пустого. */
+        full {
+            border-waveform = <0x05>;
+        };
+
+        partial {
+            border-waveform = <0x3c>;
+        };
+    };
+};
+
+/* CDC-ACM для канала «агент на маке -> донгл», по образцу штатного
+   сниппета studio-rpc-usb-uart. */
+&zephyr_udc0 {
+    host_cdc: host_cdc {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};

@@ -1,0 +1,16 @@
+if SHIELD_SWEEP_DONGLE
+
+config ZMK_KEYBOARD_NAME
+    default "Sweep Dongle"
+
+# Донгл питается от USB и должен быть всегда живым: экран и CDC-канал к маку
+# не переживут глубокий сон, а экономить тут нечего.
+config ZMK_SLEEP
+    default n
+
+# Питание на гребёнку VCC у nice!nano v2 идёт через ключ на P0.13
+# (узел EXT_POWER в nice_nano_v2.dts). Без него дисплей просто не запитан.
+config ZMK_EXT_POWER
+    default y
+
+endif

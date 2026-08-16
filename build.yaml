@@ -30,3 +30,6 @@ include:
     
   - board: nice_nano_v2
     shield: settings_reset
+
+  - board: nice_nano_v2
+    shield: sweep_dongle

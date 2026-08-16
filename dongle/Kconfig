@@ -1,0 +1,43 @@
+config SWEEP_DONGLE_UI
+    bool "Экран донгла Sweep и каналы данных от мака"
+    depends on ZMK_DISPLAY
+    default y if SHIELD_SWEEP_DONGLE
+    help
+      Свой status screen вместо встроенного плюс приём метрик мака.
+      Требует ZMK_DISPLAY_STATUS_SCREEN_CUSTOM.
+
+if SWEEP_DONGLE_UI
+
+config SWEEP_DONGLE_HOST_LINK_CDC
+    bool "Приём метрик мака через USB CDC-ACM"
+    depends on USB_CDC_ACM
+    default y
+    help
+      Работает, пока донгл воткнут кабелем. Нужен узел host_cdc в оверлее.
+
+config SWEEP_DONGLE_HOST_LINK_GATT
+    bool "Приём метрик мака через свою GATT-характеристику"
+    depends on ZMK_BLE
+    default y
+    help
+      Работает и на батарее: сервис висит на том же BLE-соединении, которым
+      донгл отдаёт HID хосту. Запись требует шифрования, то есть сопряжения.
+
+config SWEEP_DONGLE_HOST_LINK_STARTUP_DELAY_MS
+    int "Задержка перед включением приёма из CDC, мс"
+    depends on SWEEP_DONGLE_HOST_LINK_CDC
+    default 500
+    help
+      Устройство CDC-ACM появляется только после usb_enable(), который ZMK
+      делает в SYS_INIT на уровне APPLICATION. Поток приёма стартует раньше,
+      поэтому ждёт.
+
+config SWEEP_DONGLE_DEBUG_REFRESH
+    bool "Логировать площадь каждого обновления панели"
+    default n
+    help
+      Вешает monitor_cb на драйвер дисплея и пишет в лог, сколько пикселей
+      ушло в панель за цикл. Отличает «LVGL отдаёт слишком большую область» от
+      «панель мигает целиком на своём частичном профиле».
+
+endif

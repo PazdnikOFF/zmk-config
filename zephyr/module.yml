@@ -1,3 +1,5 @@
 build:
+  cmake: dongle
+  kconfig: dongle/Kconfig
   settings:
     board_root: .

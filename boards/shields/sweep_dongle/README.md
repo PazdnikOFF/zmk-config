@@ -142,7 +142,7 @@ layout=RU cpu=23 mem=61 disk=142 batt=87 chg=1
 `build-user-config@v0.3`, готовые `.uf2` лежат в артефактах сборки.
 
 ```bash
-gh run download --name sweep_dongle-nice_nano_v2-zmk
+gh run download --name firmware
 ```
 
 Локальная сборка в контейнере была, но от неё отказались: воркспейс west это

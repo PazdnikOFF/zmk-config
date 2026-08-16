@@ -1,2 +1,5 @@
 
 .zmk/
+
+/firmware/
+mac-agent/SweepDongleAgent.app/

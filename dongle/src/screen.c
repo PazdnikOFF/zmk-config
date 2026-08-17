@@ -420,6 +420,7 @@ void dongle_ui_fill_state(struct dongle_public_state *out) {
     out->batt_left = (left < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)left;
     out->batt_right = (right < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)right;
     out->batt_dongle = kbd.self_batt > 0 ? kbd.self_batt : DONGLE_BATT_UNKNOWN;
+    out->left_slot = (kbd.left_slot < 0) ? 0xFF : (uint8_t)kbd.left_slot;
 
     const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
 
@@ -486,12 +487,25 @@ static int dongle_ui_event_listener(const zmk_event_t *eh) {
                 kbd_state.slot_batt[pb->source] = pb->state_of_charge;
                 dirty = true;
             }
-        } else if (pos != NULL && kbd_state.left_slot < 0 &&
-                   pos->source < ARRAY_SIZE(kbd_state.slot_batt)) {
-            /* Первое же нажатие говорит, какой слот — левая половина. */
-            kbd_state.left_slot =
+        } else if (pos != NULL && pos->source < ARRAY_SIZE(kbd_state.slot_batt)) {
+            /*
+             * Сторона определяется по КАЖДОМУ нажатию, а не только по первому.
+             * Позиции у половин не пересекаются, поэтому источник события
+             * однозначно указывает, какой слот левый, и вывод сам себя
+             * подтверждает на каждом нажатии. Одноразовое определение было
+             * хрупким: слоты раздаются по порядку подключения и сбрасываются
+             * при каждой перезагрузке донгла, а проверить его было нечем.
+             *
+             * Локальные события сюда не попадают: у них source равен
+             * ZMK_POSITION_STATE_CHANGE_SOURCE_LOCAL, то есть 255.
+             */
+            const int8_t slot =
                 position_is_left(pos->position) ? pos->source : (pos->source == 0 ? 1 : 0);
-            dirty = true;
+
+            if (kbd_state.left_slot != slot) {
+                kbd_state.left_slot = slot;
+                dirty = true;
+            }
         }
     }
 

@@ -51,6 +51,12 @@ struct dongle_public_state {
     uint8_t batt_dongle;
     uint8_t bt_profile; /* нумерация с единицы, как на экране */
     uint8_t bt_flags;
+    /*
+     * Какой слот периферии признан левой половиной. Нужен не для показа, а
+     * чтобы расхождение между панелью и меню можно было увидеть, а не
+     * гадать о нём: 0xFF означает, что сторона ещё не определена.
+     */
+    uint8_t left_slot;
 } __packed;
 
 void dongle_ui_fill_state(struct dongle_public_state *out);

@@ -497,6 +497,21 @@ static int dongle_ui_event_listener(const zmk_event_t *eh) {
                 dirty = true;
             }
         } else if (pos != NULL && pos->source < ARRAY_SIZE(kbd_state.slot_batt)) {
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_DEBUG_LATENCY)
+            /*
+             * Метка времени прихода нажатия с половинки. Делит задачу пополам:
+             * ровные промежутки при вязкой печати означают, что тормозит
+             * участок донгл-хост, рваные — участок половинка-донгл.
+             */
+            {
+                static int64_t prev_ms;
+                const int64_t now = k_uptime_get();
+
+                LOG_WRN("key src=%u pos=%u state=%u dt=%lld", pos->source, pos->position,
+                        pos->state, prev_ms ? now - prev_ms : 0);
+                prev_ms = now;
+            }
+#endif
             /*
              * Сторона определяется по КАЖДОМУ нажатию, а не только по первому.
              * Позиции у половин не пересекаются, поэтому источник события

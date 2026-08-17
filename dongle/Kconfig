@@ -73,6 +73,14 @@ config SWEEP_DONGLE_HOST_LINK_STARTUP_DELAY_MS
       делает в SYS_INIT на уровне APPLICATION. Поток приёма стартует раньше,
       поэтому ждёт.
 
+config SWEEP_DONGLE_DEBUG_LATENCY
+    bool "Логировать время прихода нажатий с половинок"
+    default n
+    help
+      Помечает момент прихода каждого события позиции. Ровные промежутки при
+      вязкой печати означают, что тормозит участок донгл-хост, рваные —
+      участок половинка-донгл.
+
 config SWEEP_DONGLE_DEBUG_REFRESH
     bool "Логировать площадь каждого обновления панели"
     default n

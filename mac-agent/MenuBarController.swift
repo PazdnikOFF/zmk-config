@@ -147,17 +147,26 @@ enum LoginItem {
  * Спрашиваем ровно один раз — отказ запоминается, чтобы не надоедать.
  */
 enum FirstRun {
-    private static let askedKey = "ru.pazdnikoff.sweepdongle.askedSetup"
+    /*
+     * Два отдельных флага, а не один общий, и это важно: после переезда в
+     * /Applications приложение перезапускается, и с общим флагом вопрос про
+     * автозапуск уже не задавался бы — он был бы «отмечен как заданный» ещё до
+     * перезапуска.
+     */
+    private static let askedInstallKey = "ru.pazdnikoff.sweepdongle.askedInstall"
+    private static let askedLoginKey = "ru.pazdnikoff.sweepdongle.askedLogin"
 
     static func askIfNeeded() {
-        guard !UserDefaults.standard.bool(forKey: askedKey) else { return }
-        UserDefaults.standard.set(true, forKey: askedKey)
+        let inApplications = Bundle.main.bundlePath.hasPrefix("/Applications/")
 
-        if !Bundle.main.bundlePath.hasPrefix("/Applications/") {
+        if !inApplications, !UserDefaults.standard.bool(forKey: askedInstallKey) {
+            UserDefaults.standard.set(true, forKey: askedInstallKey)
             offerInstall()
             return
         }
 
+        guard !UserDefaults.standard.bool(forKey: askedLoginKey) else { return }
+        UserDefaults.standard.set(true, forKey: askedLoginKey)
         offerLoginItem()
     }
 
@@ -171,7 +180,7 @@ enum FirstRun {
         alert.addButton(withTitle: "Не сейчас")
 
         guard alert.runModal() == .alertFirstButtonReturn else {
-            offerLoginItem()
+            askIfNeeded()  // переезд отклонён — сразу спрашиваем про автозапуск
             return
         }
 
@@ -193,7 +202,7 @@ enum FirstRun {
             alert.messageText = "Не удалось переместить"
             alert.informativeText = error.localizedDescription
             alert.runModal()
-            offerLoginItem()
+            askIfNeeded()
             return
         }
 

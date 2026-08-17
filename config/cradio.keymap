@@ -14,6 +14,18 @@
 #define FNC    3
 #define FNC_2  4
 
+/*
+ * Вызов голосового ввода Handy: Ctrl+Alt+Cmd+Space.
+ *
+ * Сочетание выбрано после разбора com.apple.symbolichotkeys.plist: ни одно из
+ * 34 включённых системных сочетаний macOS не использует эту комбинацию
+ * модификаторов. Три модификатора вдобавок практически исключают совпадение с
+ * сочетаниями внутри программ.
+ *
+ * Это же сочетание нужно назначить в самом Handy — клавиатура его лишь шлёт.
+ */
+#define VOICE &kp LC(LA(LG(SPACE)))
+
 &mt {
     //  flavor = "tap-preferred";
     // tapping_term_ms = <200>;
@@ -61,7 +73,7 @@
             bindings = <
 &kp Q  &kp W  &kp E  &kp R  &kp T        &kp Y           &kp U  &kp I      &kp O    &dc LBKT P
 &kp A  &kp S  &kp D  &kp F  &kp G        &kp H           &kp J  &kp K      &kp L    &dc SQT SEMI
-&kp Z  &kp X  &kp C  &kp V  &kp B        &kp N           &kp M  &kp COMMA  &kp DOT  &kp SLASH
+&kp Z  &kp X  &kp C  &kp V  &kp B        &kp N           &dc RBKT M  &kp COMMA  &kp DOT  &kp SLASH
                      &mo 3  &kp SPACE    &kp LEFT_SHIFT  &mo 1
             >;
         };
@@ -96,7 +108,7 @@
 &kp GRAVE  &kp BSLH   &kp PRCNT  &none      &none    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
 &kp TILDE  &kp PIPE   &kp CARET  &none      &none    &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &none         &bt BT_CLR_ALL
 &kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &none         &studio_unlock
-                                 &none      &none    &none              &none
+                                 VOICE      &none    &none              &none
             >;
         };
 

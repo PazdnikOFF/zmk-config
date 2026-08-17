@@ -602,7 +602,12 @@ static void build_half_icon(lv_obj_t *screen, struct batt_icon *icon, int16_t x,
     icon->fill = make_box(body, 0, 0, ICON_W - 2 * ICON_BORDER, 0, false);
     lv_obj_align(icon->fill, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-    const int16_t thumb_x = is_left ? (x + ICON_W - THUMB_W - 4) : (x + 4);
+    /*
+     * Выступ смотрит к центру экрана, а не привязан к тому, левая это половина
+     * или правая: блоки можно менять местами, и выступ останется правильным.
+     */
+    const bool on_screen_left = x < (200 - ICON_W) / 2;
+    const int16_t thumb_x = on_screen_left ? (x + ICON_W - THUMB_W - 4) : (x + 4);
     make_box(screen, thumb_x, ICON_Y + ICON_H, THUMB_W, THUMB_H, true);
 
     /* Подпись внутри силуэта: читать «какая это половина» на глаз оказалось
@@ -663,10 +668,15 @@ lv_obj_t *zmk_display_status_screen(void) {
         kbd_state.slot_batt[i] = UNKNOWN_BATT;
     }
 
-    /* Ряд батарей: левая половина — донгл — правая половина. */
-    build_half_icon(screen, &icon_left, LEFT_X, true);
+    /*
+     * Ряд батарей. Блок левой половины стоит СПРАВА, правой — слева: так они
+     * расположены относительно того, как на донгл смотрят. Буква внутри
+     * силуэта говорит, какая это половина, поэтому перестановка ничего не
+     * запутывает.
+     */
+    build_half_icon(screen, &icon_right, LEFT_X, false);
     build_dongle_icon(screen, &icon_dongle, DONGLE_X);
-    build_half_icon(screen, &icon_right, RIGHT_X, false);
+    build_half_icon(screen, &icon_left, RIGHT_X, true);
 
     make_rule(screen, 70);
 

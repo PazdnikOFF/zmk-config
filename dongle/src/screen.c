@@ -565,9 +565,13 @@ static lv_obj_t *make_box(lv_obj_t *parent, int16_t x, int16_t y, int16_t w, int
 }
 
 /*
- * Силуэт половины клавиатуры: блок клавиш плюс выступ под большие пальцы с
- * внутренней стороны. Заливается только основной блок — растить заливку через
- * две фигуры сразу незачем, читается и так.
+ * Силуэт половины клавиатуры: блок клавиш плюс выступ под большие пальцы.
+ * Заливается только основной блок — растить заливку через две фигуры сразу
+ * незачем, читается и так.
+ *
+ * Сторона выступа выбрана по тому, как это выглядит на столе, а не по
+ * геометрии платы. Привязка зарядов к половинам от этого не зависит и живёт
+ * отдельно, в render_batt_cb.
  */
 static void build_half_icon(lv_obj_t *screen, struct batt_icon *icon, int16_t x, bool is_left) {
     lv_obj_t *body = make_box(screen, x, ICON_Y, ICON_W, ICON_H, true);
@@ -575,7 +579,7 @@ static void build_half_icon(lv_obj_t *screen, struct batt_icon *icon, int16_t x,
     icon->fill = make_box(body, 0, 0, ICON_W - 2 * ICON_BORDER, 0, false);
     lv_obj_align(icon->fill, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-    const int16_t thumb_x = is_left ? (x + ICON_W - THUMB_W - 4) : (x + 4);
+    const int16_t thumb_x = is_left ? (x + 4) : (x + ICON_W - THUMB_W - 4);
     make_box(screen, thumb_x, ICON_Y + ICON_H, THUMB_W, THUMB_H, true);
 
     icon->label = make_label(screen, &lv_font_montserrat_16, x, PCT_Y, "--");

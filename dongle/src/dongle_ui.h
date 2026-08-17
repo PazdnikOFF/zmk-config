@@ -24,3 +24,33 @@ struct dongle_host_state {
  * трогается только из неё.
  */
 void dongle_ui_set_host(const struct dongle_host_state *st);
+
+/*
+ * Слепок состояния для чтения снаружи — его отдаёт GATT-характеристика
+ * состояния, по которой строится меню в строке состояния macOS.
+ *
+ * Только чтение и никаких уведомлений: любой обмен по радио конкурирует с
+ * нажатиями, а агент читает это лишь в паузах печати и при открытии меню.
+ *
+ * Раскладка полей зафиксирована и разбирается агентом побайтно, поэтому
+ * структура упакована и начинается с версии: добавлять поля можно только в
+ * конец и с ростом версии.
+ */
+#define DONGLE_STATE_VERSION 1
+#define DONGLE_BATT_UNKNOWN 0xFF
+
+#define DONGLE_BT_CONNECTED BIT(0)
+#define DONGLE_BT_OPEN BIT(1)
+#define DONGLE_BT_USB BIT(2)
+
+struct dongle_public_state {
+    uint8_t version;
+    uint8_t layer;
+    uint8_t batt_left;
+    uint8_t batt_right;
+    uint8_t batt_dongle;
+    uint8_t bt_profile; /* нумерация с единицы, как на экране */
+    uint8_t bt_flags;
+} __packed;
+
+void dongle_ui_fill_state(struct dongle_public_state *out);

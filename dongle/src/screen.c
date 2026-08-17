@@ -400,6 +400,45 @@ void dongle_ui_set_host(const struct dongle_host_state *st) {
     k_mutex_unlock(&state_mutex);
 }
 
+/* --- состояние наружу ------------------------------------------------------ */
+
+void dongle_ui_fill_state(struct dongle_public_state *out) {
+    struct dongle_kbd_state kbd;
+
+    k_mutex_lock(&state_mutex, K_FOREVER);
+    kbd = kbd_state;
+    k_mutex_unlock(&state_mutex);
+
+    int16_t left = UNKNOWN_BATT, right = UNKNOWN_BATT;
+    if (kbd.left_slot >= 0) {
+        left = kbd.slot_batt[kbd.left_slot];
+        right = kbd.slot_batt[kbd.left_slot == 0 ? 1 : 0];
+    }
+
+    out->version = DONGLE_STATE_VERSION;
+    out->layer = zmk_keymap_highest_layer_active();
+    out->batt_left = (left < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)left;
+    out->batt_right = (right < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)right;
+    out->batt_dongle = kbd.self_batt > 0 ? kbd.self_batt : DONGLE_BATT_UNKNOWN;
+
+    const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
+
+    if (endpoint.transport == ZMK_TRANSPORT_USB) {
+        out->bt_profile = 0;
+        out->bt_flags = DONGLE_BT_USB;
+        return;
+    }
+
+    out->bt_profile = endpoint.ble.profile_index + 1;
+    out->bt_flags = 0;
+    if (zmk_ble_active_profile_is_open()) {
+        out->bt_flags |= DONGLE_BT_OPEN;
+    }
+    if (zmk_ble_active_profile_is_connected()) {
+        out->bt_flags |= DONGLE_BT_CONNECTED;
+    }
+}
+
 /* --- слушатели событий ZMK ------------------------------------------------ */
 
 static bool position_is_left(uint32_t position) {

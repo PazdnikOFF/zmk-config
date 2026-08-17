@@ -16,6 +16,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include "dongle_ui.h"
 #include "host_proto.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -28,8 +29,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define SWEEP_HOST_METRICS_UUID                                                                    \
     BT_UUID_128_ENCODE(0xa336bc14, 0x26b6, 0x4cb1, 0x93b0, 0xa6a0d71e9275)
 
+/* 6c0f2a91-... — состояние донгла, только на чтение. */
+#define SWEEP_HOST_STATE_UUID                                                                      \
+    BT_UUID_128_ENCODE(0x6c0f2a91, 0x5d3e, 0x4f18, 0x9a72, 0xb84c1e5d70a3)
+
 static const struct bt_uuid_128 host_service_uuid = BT_UUID_INIT_128(SWEEP_HOST_SERVICE_UUID);
 static const struct bt_uuid_128 host_metrics_uuid = BT_UUID_INIT_128(SWEEP_HOST_METRICS_UUID);
+static const struct bt_uuid_128 host_state_uuid = BT_UUID_INIT_128(SWEEP_HOST_STATE_UUID);
 
 static ssize_t write_metrics(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf,
                              uint16_t len, uint16_t offset, uint8_t flags) {
@@ -62,7 +68,23 @@ static ssize_t write_metrics(struct bt_conn *conn, const struct bt_gatt_attr *at
     return len;
 }
 
+/*
+ * Состояние отдаётся только по запросу и без уведомлений. Уведомления
+ * означали бы обмен в эфире в произвольный момент, в том числе посреди печати,
+ * а мы ровно от этого и уходили: агент читает состояние сам и только в паузах.
+ */
+static ssize_t read_state(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf,
+                          uint16_t len, uint16_t offset) {
+    struct dongle_public_state state;
+
+    dongle_ui_fill_state(&state);
+
+    return bt_gatt_attr_read(conn, attr, buf, len, offset, &state, sizeof(state));
+}
+
 BT_GATT_SERVICE_DEFINE(sweep_host_svc, BT_GATT_PRIMARY_SERVICE(&host_service_uuid),
+                       BT_GATT_CHARACTERISTIC(&host_state_uuid.uuid, BT_GATT_CHRC_READ,
+                                              BT_GATT_PERM_READ_ENCRYPT, read_state, NULL, NULL),
                        BT_GATT_CHARACTERISTIC(&host_metrics_uuid.uuid,
                                               BT_GATT_CHRC_WRITE |
                                                   BT_GATT_CHRC_WRITE_WITHOUT_RESP,

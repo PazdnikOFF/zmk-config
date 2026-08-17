@@ -18,6 +18,10 @@ struct DongleState {
     var btProfile: UInt8  // нумерация с единицы; 0 означает USB
     var btFlags: UInt8
 
+    /// Какой слот периферии донгл считает левой половиной; nil — ещё не знает.
+    /// Показывается в меню, чтобы расхождение с панелью можно было увидеть.
+    var leftSlot: UInt8?
+
     var isUSB: Bool { btFlags & 0b100 != 0 }
     var isConnected: Bool { btFlags & 0b001 != 0 }
     var isOpen: Bool { btFlags & 0b010 != 0 }
@@ -31,6 +35,9 @@ struct DongleState {
         battDongle = data[4]
         btProfile = data[5]
         btFlags = data[6]
+
+        // Поле появилось во второй версии — у первой его просто нет.
+        leftSlot = (data.count >= 8 && data[7] != 0xFF) ? data[7] : nil
     }
 
     /// Имена слоёв держатся синхронно с config/cradio.keymap.

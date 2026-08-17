@@ -63,6 +63,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(disabled("Слой: \(state.layerName)"))
         menu.addItem(disabled("Выход: \(state.outputDescription)"))
 
+        if let slot = state.leftSlot {
+            menu.addItem(disabled("Левая половина — слот \(slot)"))
+        } else {
+            menu.addItem(disabled("Стороны ещё не определены — нажмите клавишу"))
+        }
+
         addControls(to: menu)
     }
 

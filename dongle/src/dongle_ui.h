@@ -36,7 +36,7 @@ void dongle_ui_set_host(const struct dongle_host_state *st);
  * структура упакована и начинается с версии: добавлять поля можно только в
  * конец и с ростом версии.
  */
-#define DONGLE_STATE_VERSION 1
+#define DONGLE_STATE_VERSION 2
 #define DONGLE_BATT_UNKNOWN 0xFF
 
 #define DONGLE_BT_CONNECTED BIT(0)

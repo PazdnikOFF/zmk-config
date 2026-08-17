@@ -33,3 +33,12 @@ include:
 
   - board: nice_nano_v2
     shield: sweep_dongle
+
+  # Диагностическая сборка: логи по USB плюс метки времени прихода нажатий.
+  # Собирается рядом с обычной, чтобы не приходилось править конфиг ради
+  # разового замера. Убрать, когда вопрос с задержками закроется.
+  - board: nice_nano_v2
+    shield: sweep_dongle
+    snippet: zmk-usb-logging
+    cmake-args: -DCONFIG_SWEEP_DONGLE_DEBUG_LATENCY=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
+    artifact-name: sweep_dongle_debug

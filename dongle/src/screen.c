@@ -483,8 +483,17 @@ static int dongle_ui_event_listener(const zmk_event_t *eh) {
         const struct zmk_position_state_changed *pos = as_zmk_position_state_changed(eh);
 
         if (pb != NULL && pb->source < ARRAY_SIZE(kbd_state.slot_batt)) {
-            if (kbd_state.slot_batt[pb->source] != pb->state_of_charge) {
-                kbd_state.slot_batt[pb->source] = pb->state_of_charge;
+            /*
+             * При разрыве связи ZMK шлёт для половины заряд 0 (см. обработчик
+             * disconnected в split/bluetooth/central.c). Это «связи нет», а не
+             * «батарея села»: настоящий ноль половина не досылает, она к тому моменту
+             * уже выключена. Показываем прочерк.
+             */
+            const int16_t level =
+                (pb->state_of_charge == 0) ? UNKNOWN_BATT : (int16_t)pb->state_of_charge;
+
+            if (kbd_state.slot_batt[pb->source] != level) {
+                kbd_state.slot_batt[pb->source] = level;
                 dirty = true;
             }
         } else if (pos != NULL && pos->source < ARRAY_SIZE(kbd_state.slot_batt)) {
@@ -569,9 +578,8 @@ static lv_obj_t *make_box(lv_obj_t *parent, int16_t x, int16_t y, int16_t w, int
  * Заливается только основной блок — растить заливку через две фигуры сразу
  * незачем, читается и так.
  *
- * Сторона выступа выбрана по тому, как это выглядит на столе, а не по
- * геометрии платы. Привязка зарядов к половинам от этого не зависит и живёт
- * отдельно, в render_batt_cb.
+ * Выступ рисуется с внутренней стороны, как он расположен на самой плате.
+ * Чтобы силуэты нельзя было прочитать наоборот, каждый подписан буквой.
  */
 static void build_half_icon(lv_obj_t *screen, struct batt_icon *icon, int16_t x, bool is_left) {
     lv_obj_t *body = make_box(screen, x, ICON_Y, ICON_W, ICON_H, true);
@@ -579,8 +587,12 @@ static void build_half_icon(lv_obj_t *screen, struct batt_icon *icon, int16_t x,
     icon->fill = make_box(body, 0, 0, ICON_W - 2 * ICON_BORDER, 0, false);
     lv_obj_align(icon->fill, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-    const int16_t thumb_x = is_left ? (x + 4) : (x + ICON_W - THUMB_W - 4);
+    const int16_t thumb_x = is_left ? (x + ICON_W - THUMB_W - 4) : (x + 4);
     make_box(screen, thumb_x, ICON_Y + ICON_H, THUMB_W, THUMB_H, true);
+
+    /* Подпись внутри силуэта: читать «какая это половина» на глаз оказалось
+       ненадёжно, буква снимает вопрос. */
+    make_label(screen, &lv_font_montserrat_16, x + 6, ICON_Y + 8, is_left ? "L" : "R");
 
     icon->label = make_label(screen, &lv_font_montserrat_16, x, PCT_Y, "--");
     lv_obj_set_width(icon->label, ICON_W);

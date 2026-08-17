@@ -23,6 +23,7 @@
 
 import Carbon
 import CoreBluetooth
+import CoreGraphics
 import Darwin
 import Foundation
 import IOKit
@@ -39,6 +40,27 @@ let kServiceUUID = CBUUID(string: "F1EF61B7-9C57-4CB7-904A-D76A71836D4C")
 let kMetricsUUID = CBUUID(string: "A336BC14-26B6-4CB1-93B0-A6A0D71E9275")
 let kHIDServiceUUID = CBUUID(string: "1812")
 let kDongleName = "Sweep Dongle"
+
+/*
+ * Пауза в печати, после которой разрешено писать в GATT.
+ *
+ * Запись идёт по тому же BLE-соединению, по которому донгл отдаёт нажатия
+ * хосту, и отнимает у них эфирное время — отсюда периодические задержки ввода.
+ * Ни у одного донгла из тех, что удалось посмотреть, хост в устройство ничего
+ * не пишет, так что готового решения не существует: канал наш, и уступать
+ * должен он.
+ *
+ * Пропущенные обновления не копятся и не досылаются: показатели мака не та
+ * величина, ради которой стоит лезть в эфир поперёк нажатий. Пауза в пару
+ * секунд при обычной печати случается постоянно.
+ */
+let kTypingQuietSeconds: CFTimeInterval = 2.0
+
+/// Секунд с последнего нажатия. Разрешений не требует — это та же функция,
+/// которой меряют простой системы, а не перехват ввода.
+func secondsSinceLastKeystroke() -> CFTimeInterval {
+    CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown)
+}
 
 /*
  * Порт хоста берётся ОДИН раз на весь процесс.
@@ -280,12 +302,13 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         guard let dongle, let metrics, let data = line.data(using: .utf8) else { return }
 
         /*
-         * Именно .withResponse: запись без ответа быстрее, но молчит об
-         * ошибках, а характеристика требует шифрования — без подтверждения мы
-         * бы не узнали, что запись отбита. Одна запись в 5 секунд, накладные
-         * расходы значения не имеют.
+         * Без подтверждения: запись с ответом занимает эфир дважды и держит
+         * ATT-канал до прихода ACK, а нажатия летят по нему же. Права на запись
+         * уже проверены на этапе внедрения, диагностика тут больше не нужна.
          */
-        dongle.writeValue(data, for: metrics, type: .withResponse)
+        let type: CBCharacteristicWriteType =
+            metrics.properties.contains(.writeWithoutResponse) ? .withoutResponse : .withResponse
+        dongle.writeValue(data, for: metrics, type: type)
     }
 
     /*
@@ -419,10 +442,13 @@ func tick() {
         "chg=\(battery.charging ? 1 : 0)",
     ].joined(separator: " ")
 
-    // Шлём в оба канала: какой из них сейчас живой, зависит от того, воткнут
-    // ли кабель, а данные одинаковые и лишними не будут.
+    // USB эфир ни с кем не делит, туда пишем всегда.
     serial.send(line)
-    bluetooth.send(line)
+
+    // А по радио — только когда в печати есть пауза. Приоритет за нажатиями.
+    if secondsSinceLastKeystroke() >= kTypingQuietSeconds {
+        bluetooth.send(line)
+    }
 }
 
 Timer.scheduledTimer(withTimeInterval: kIntervalSeconds, repeats: true) { _ in tick() }

@@ -21,6 +21,7 @@
 //  ad-hoc подписью, а `open` такой бандл не запускает (-10825).
 //
 
+import AppKit
 import Carbon
 import CoreBluetooth
 import CoreGraphics
@@ -38,6 +39,7 @@ let kIntervalSeconds = 5.0
 // Должно совпадать с dongle/src/host_gatt.c.
 let kServiceUUID = CBUUID(string: "F1EF61B7-9C57-4CB7-904A-D76A71836D4C")
 let kMetricsUUID = CBUUID(string: "A336BC14-26B6-4CB1-93B0-A6A0D71E9275")
+let kStateUUID = CBUUID(string: "6C0F2A91-5D3E-4F18-9A72-B84C1E5D70A3")
 let kHIDServiceUUID = CBUUID(string: "1812")
 let kDongleName = "Sweep Dongle"
 
@@ -289,7 +291,10 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     private var central: CBCentralManager!
     private var dongle: CBPeripheral?
     private var metrics: CBCharacteristic?
-    private var didLogFirstWrite = false
+    private var stateChar: CBCharacteristic?
+
+    /// Последний вычитанный слепок — из него строится меню, без похода в эфир.
+    private(set) var lastState: DongleState?
 
     override init() {
         super.init()
@@ -297,6 +302,13 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     }
 
     var isConnected: Bool { metrics != nil }
+
+    /// Читается в том же окне паузы, что и запись метрик: одно обращение в
+    /// эфир вместо двух независимых.
+    func readState() {
+        guard let dongle, let stateChar else { return }
+        dongle.readValue(for: stateChar)
+    }
 
     func send(_ line: String) {
         guard let dongle, let metrics, let data = line.data(using: .utf8) else { return }
@@ -391,17 +403,26 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             return
         }
 
-        peripheral.discoverCharacteristics([kMetricsUUID], for: service)
+        peripheral.discoverCharacteristics([kMetricsUUID, kStateUUID], for: service)
+    }
+
+    func peripheral(
+        _ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,
+        error: Error?
+    ) {
+        guard characteristic.uuid == kStateUUID, let data = characteristic.value else { return }
+
+        lastState = DongleState(data)
+        menuBar?.update(state: lastState, linkUp: isConnected)
     }
 
     func peripheral(
         _ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?
     ) {
+        /* При записи без подтверждения сюда обычно не приходят, но если
+           контроллер всё же ответил ошибкой — знать об этом полезно. */
         if let error {
             log("BLE: запись отбита — \(error.localizedDescription)")
-        } else if !didLogFirstWrite {
-            didLogFirstWrite = true
-            log("BLE: запись прошла, канал по воздуху рабочий")
         }
     }
 
@@ -409,18 +430,12 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?
     ) {
         metrics = service.characteristics?.first(where: { $0.uuid == kMetricsUUID })
+        stateChar = service.characteristics?.first(where: { $0.uuid == kStateUUID })
         log(metrics != nil ? "BLE: канал готов" : "BLE: характеристика не найдена")
+
+        readState()
     }
 }
-
-// MARK: - Основной цикл
-
-let serial = SerialLink()
-let bluetooth = BluetoothLink()
-let cpu = CPUSampler()
-
-// Первая выборка CPU задаёт базу для дельты и сама по себе смысла не несёт.
-_ = cpu.sample()
 
 /*
  * Загрузка и память округляются до 5%. Это не косметика: каждое изменение
@@ -429,8 +444,18 @@ _ = cpu.sample()
  */
 func rounded5(_ value: Int) -> Int { (value + 2) / 5 * 5 }
 
+// MARK: - Приложение
+
+let serial = SerialLink()
+let bluetooth = BluetoothLink()
+let cpu = CPUSampler()
+
+var menuBar: MenuBarController?
+
 func tick() {
     bluetooth.poll()
+
+    guard menuBar?.isPaused != true else { return }
 
     let battery = batteryState()
     let line = [
@@ -445,11 +470,32 @@ func tick() {
     // USB эфир ни с кем не делит, туда пишем всегда.
     serial.send(line)
 
-    // А по радио — только когда в печати есть пауза. Приоритет за нажатиями.
+    /*
+     * А по радио — только когда в печати есть пауза, и обе операции в одном
+     * окне: отдали метрики, тут же забрали состояние. Приоритет за нажатиями.
+     */
     if secondsSinceLastKeystroke() >= kTypingQuietSeconds {
         bluetooth.send(line)
+        bluetooth.readState()
+    }
+
+    menuBar?.update(state: bluetooth.lastState, linkUp: bluetooth.isConnected)
+}
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var timer: Timer?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        menuBar = MenuBarController()
+        FirstRun.askIfNeeded()
+
+        // Первая выборка CPU задаёт базу для дельты и смысла не несёт.
+        _ = cpu.sample()
+
+        timer = Timer.scheduledTimer(withTimeInterval: kIntervalSeconds, repeats: true) { _ in
+            tick()
+        }
+        tick()
     }
 }
 
-Timer.scheduledTimer(withTimeInterval: kIntervalSeconds, repeats: true) { _ in tick() }
-RunLoop.main.run()

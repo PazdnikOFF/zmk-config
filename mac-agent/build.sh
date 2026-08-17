@@ -15,8 +15,14 @@ APP="SweepDongleAgent.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 cp Info.plist "$APP/Contents/Info.plist"
+printf 'APPL????' > "$APP/Contents/PkgInfo"
 
-swiftc -O -o "$APP/Contents/MacOS/SweepDongleAgent" SweepDongleAgent.swift
+# -target обязателен. По умолчанию тулчейн ставит в Mach-O minos 28.0 — выше,
+# чем сама система, — и LaunchServices отказывается запускать бандл с ошибкой
+# -10825 (kLSIncompatibleApplicationVersionErr). В Info.plist это не лечится,
+# потому что причина в load-команде LC_BUILD_VERSION, а не в бандле.
+# 14.0 достаточно: SMAppService требует 13.0.
+swiftc -O -target arm64-apple-macos14.0 -o "$APP/Contents/MacOS/SweepDongleAgent" *.swift
 
 codesign --force --sign - --identifier ru.pazdnikoff.sweepdongle.agent "$APP"
 

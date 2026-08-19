@@ -7,6 +7,7 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
 
 #define QWERTY 0
 #define SYM    1
@@ -25,6 +26,19 @@
  * Это же сочетание нужно назначить в самом Handy — клавиатура его лишь шлёт.
  */
 #define VOICE &kp LC(LA(LG(SPACE)))
+
+/*
+ * Выбор выхода: USB или BLE.
+ *
+ * ZMK стартует с preferred_transport = ZMK_TRANSPORT_USB и меняет его ТОЛЬКО
+ * биндингом &out; значение потом лежит в настройках. Пока готовы оба выхода,
+ * побеждает USB — то есть любой воткнутый кабель, хоть для зарядки донгла,
+ * хоть для снятия логов, молча уводит нажатия с BLE. Со стороны это выглядит
+ * как «клавиатура не печатает по BLE», хотя половинки, донгл и мак исправны.
+ *
+ * Без этих двух клавиш вернуть вывод на BLE было нечем: Kconfig на выбор
+ * выхода в ZMK нет, только поведение &out.
+ */
 
 &mt {
     //  flavor = "tap-preferred";
@@ -106,8 +120,8 @@
         sym_2_layer {
             bindings = <
 &kp GRAVE  &kp BSLH   &kp PRCNT  &none      &none    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
-&kp TILDE  &kp PIPE   &kp CARET  &none      &none    &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &none         &bt BT_CLR_ALL
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &none         &studio_unlock
+&kp TILDE  &kp PIPE   &kp CARET  &none      &none    &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
                                  VOICE      &none    &none              &none
             >;
         };

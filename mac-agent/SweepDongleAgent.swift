@@ -107,6 +107,33 @@ private func usbIDs(startingAt service: io_object_t) -> (vid: Int, pid: Int)? {
     return nil
 }
 
+/// Ищет числовое свойство вверх по дереву, как и usbIDs. `bInterfaceNumber`
+/// лежит на узле интерфейса, то есть встретится раньше, чем узел устройства с
+/// idVendor/idProduct.
+private func intProperty(_ key: String, startingAt service: io_object_t) -> Int? {
+    var node = service
+    IOObjectRetain(node)
+    defer { IOObjectRelease(node) }
+
+    for _ in 0..<12 {
+        if let value = IORegistryEntryCreateCFProperty(node, key as CFString, kCFAllocatorDefault, 0)?
+            .takeRetainedValue() as? Int
+        {
+            return value
+        }
+
+        var parent: io_registry_entry_t = 0
+        guard IORegistryEntryGetParentEntry(node, kIOServicePlane, &parent) == KERN_SUCCESS else {
+            return nil
+        }
+
+        IOObjectRelease(node)
+        node = parent
+    }
+
+    return nil
+}
+
 func findDonglePort() -> String? {
     guard let matching = IOServiceMatching(kIOSerialBSDServiceValue) as NSMutableDictionary? else {
         return nil
@@ -119,6 +146,8 @@ func findDonglePort() -> String? {
     }
     defer { IOObjectRelease(iterator) }
 
+    var candidates: [(interface: Int, path: String)] = []
+
     while case let service = IOIteratorNext(iterator), service != 0 {
         defer { IOObjectRelease(service) }
 
@@ -128,12 +157,28 @@ func findDonglePort() -> String? {
             )?.takeRetainedValue() as? String
         else { continue }
 
-        if let ids = usbIDs(startingAt: service), ids.vid == kVendorID, ids.pid == kProductID {
-            return callout
-        }
+        guard let ids = usbIDs(startingAt: service), ids.vid == kVendorID, ids.pid == kProductID
+        else { continue }
+
+        candidates.append((intProperty("bInterfaceNumber", startingAt: service) ?? Int.max, callout))
     }
 
-    return nil
+    guard !candidates.isEmpty else { return nil }
+
+    /*
+     * Берём НАИМЕНЬШИЙ номер интерфейса, а не «что первым отдал IORegistry».
+     * В отладочной сборке донгл поднимает два порта CDC — наш host_cdc и лог
+     * ZMK, — а порядок обхода реестра между запусками ничем не закреплён.
+     * Раньше агент мог начать писать метрики в лог-порт, и экран просто
+     * переставал обновляться, без единого сообщения об ошибке.
+     */
+    candidates.sort { ($0.interface, $0.path) < ($1.interface, $1.path) }
+
+    if candidates.count > 1 {
+        log("USB: портов \(candidates.count), беру интерфейс \(candidates[0].interface)")
+    }
+
+    return candidates[0].path
 }
 
 // MARK: - Метрики

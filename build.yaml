@@ -47,5 +47,5 @@ include:
   - board: nice_nano_v2
     shield: sweep_dongle
     snippet: zmk-usb-logging
-    cmake-args: -DCONFIG_SWEEP_DONGLE_DEBUG_LATENCY=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
+    cmake-args: -DCONFIG_SWEEP_DONGLE_DEBUG_LATENCY=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
     artifact-name: sweep_dongle_debug

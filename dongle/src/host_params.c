@@ -26,6 +26,7 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -42,13 +43,32 @@ BUILD_ASSERT(HOST_TIMEOUT * 8 > (1 + HOST_LATENCY) * HOST_INTERVAL_MAX * 2,
              "таймаут меньше допустимого для выбранного интервала");
 BUILD_ASSERT(HOST_TIMEOUT <= 600, "Apple не принимает таймаут больше 6 с");
 
+/*
+ * Задержка перед запросом. Сразу после коннекта хост занят шифрованием и
+ * разбором сервисов и отклоняет запрос, поэтому ждём. Пять секунд не годятся:
+ * ровно в этот момент (CONFIG_BT_CONN_PARAM_UPDATE_TIMEOUT) свой автоматический
+ * запрос шлёт сам Zephyr, и два запроса гоняются друг с другом. С тех пор как
+ * PPCP в sweep_dongle.conf приведён к тем же значениям, автоматический запрос
+ * просит то же самое, а этот работает повторной попыткой после него.
+ */
+#define HOST_PARAM_DELAY K_SECONDS(7)
+
 static void request_params(struct k_work *work);
 
 static K_WORK_DELAYABLE_DEFINE(param_work, request_params);
-static struct bt_conn *pending;
+
+/*
+ * Соединение, которому предстоит отправить запрос.
+ *
+ * Указатель атомарный не для красоты: пишет его коллбэк bt_conn_cb из потока
+ * BT RX, а читает и освобождает работа из системной очереди. На обычном
+ * указателе эти двое могли сойтись на одном и том же объекте и снять с него
+ * ссылку дважды.
+ */
+static atomic_ptr_t pending = ATOMIC_PTR_INIT(NULL);
 
 static void request_params(struct k_work *work) {
-    struct bt_conn *conn = pending;
+    struct bt_conn *conn = atomic_ptr_set(&pending, NULL);
 
     if (conn == NULL) {
         return;
@@ -67,7 +87,6 @@ static void request_params(struct k_work *work) {
     }
 
     bt_conn_unref(conn);
-    pending = NULL;
 }
 
 static void on_connected(struct bt_conn *conn, uint8_t err) {
@@ -83,16 +102,28 @@ static void on_connected(struct bt_conn *conn, uint8_t err) {
         return;
     }
 
-    if (pending != NULL) {
-        bt_conn_unref(pending);
+    struct bt_conn *previous = atomic_ptr_set(&pending, bt_conn_ref(conn));
+
+    if (previous != NULL) {
+        bt_conn_unref(previous);
     }
 
-    /*
-     * Не сразу: сначала хост завершает свои дела с шифрованием и разбором
-     * сервисов, и запрос посреди этого он отклоняет.
-     */
-    pending = bt_conn_ref(conn);
-    k_work_reschedule(&param_work, K_SECONDS(5));
+    k_work_reschedule(&param_work, HOST_PARAM_DELAY);
+}
+
+/*
+ * Хост отвалился раньше, чем дошли руки до запроса: снимаем ссылку сразу, а не
+ * держим её ещё несколько секунд на заведомо мёртвом соединении. Сравнение
+ * через CAS обязательно — за это время pending мог смениться на другое
+ * соединение, и обнулять его вслепую нельзя.
+ */
+static void on_disconnected(struct bt_conn *conn, uint8_t reason) {
+    ARG_UNUSED(reason);
+
+    if (atomic_ptr_cas(&pending, conn, NULL)) {
+        k_work_cancel_delayable(&param_work);
+        bt_conn_unref(conn);
+    }
 }
 
 static void on_param_updated(struct bt_conn *conn, uint16_t interval, uint16_t latency,
@@ -103,5 +134,6 @@ static void on_param_updated(struct bt_conn *conn, uint16_t interval, uint16_t l
 
 BT_CONN_CB_DEFINE(host_params_cb) = {
     .connected = on_connected,
+    .disconnected = on_disconnected,
     .le_param_updated = on_param_updated,
 };

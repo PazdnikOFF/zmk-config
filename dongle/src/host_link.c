@@ -50,11 +50,15 @@ static void host_link_isr(const struct device *dev, void *user_data) {
         return;
     }
 
-    while (uart_irq_rx_ready(dev)) {
-        if (uart_fifo_read(dev, &c, 1) != 1) {
-            continue;
-        }
-
+    /*
+     * КАПКАН: раньше условием цикла было одно только uart_irq_rx_ready(), а
+     * неудачное чтение обрабатывалось через `continue`. Признак rx_ready у
+     * cdc_acm живёт отдельно от содержимого кольцевого буфера, поэтому нулевое
+     * чтение возвращало нас к тому же самому истинному условию — и обработчик
+     * оставался в цикле навсегда, вешая очередь USB. Выходим по первому же
+     * чтению, которое не дало байта.
+     */
+    while (uart_irq_rx_ready(dev) && uart_fifo_read(dev, &c, 1) == 1) {
         if (c == '\r') {
             continue;
         }

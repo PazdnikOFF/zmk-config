@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
@@ -79,7 +80,12 @@ K_MUTEX_DEFINE(state_mutex);
 static struct dongle_host_state host_state;
 
 struct dongle_kbd_state {
-    uint8_t self_batt;
+    /*
+     * Заряд самого донгла. Знаковый и с UNKNOWN_BATT, как и у половин: с
+     * uint8_t «ещё не мерили» было неотличимо от честного нуля, и последний
+     * показывался прочерком.
+     */
+    int16_t self_batt;
     int16_t slot_batt[ZMK_SPLIT_CENTRAL_PERIPHERAL_COUNT];
     /*
      * Какой слот периферии оказался левой половиной. Слоты раздаются по
@@ -91,10 +97,50 @@ struct dongle_kbd_state {
 
 static struct dongle_kbd_state kbd_state;
 
-/* Моменты последних отрисовок — для ограничителей частоты, см. schedule(). */
+/*
+ * Состояние приводится в «ничего не известно» отдельным SYS_INIT, а не в
+ * zmk_display_status_screen(), как было раньше.
+ *
+ * Построение экрана происходит в очереди дисплея и не связано по времени с
+ * приходом событий: батареи и нажатия могли доехать раньше, и тогда уже
+ * определённая сторона половины затиралась обратно в «неизвестно». SYS_INIT же
+ * заведомо раньше любого подключения по радио, так что и мьютекс здесь не
+ * нужен — конкурировать ещё некому.
+ */
+static int dongle_ui_state_init(void) {
+    kbd_state.self_batt = UNKNOWN_BATT;
+    kbd_state.left_slot = -1;
+
+    for (size_t i = 0; i < ARRAY_SIZE(kbd_state.slot_batt); i++) {
+        kbd_state.slot_batt[i] = UNKNOWN_BATT;
+    }
+
+    return 0;
+}
+
+SYS_INIT(dongle_ui_state_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+
+/*
+ * Моменты последних отрисовок (см. schedule()) и признак простоя.
+ *
+ * Пишутся из очереди дисплея, читаются из потока BT RX, в котором исполняются
+ * слушатели событий ZMK. Запись int64_t на 32-битном ядре не атомарна, поэтому
+ * доступ закрыт спинлоком: он дёшев и работает из любого контекста, в отличие
+ * от мьютекса. Внутрь спинлока нельзя звать API очередей работ, поэтому он
+ * держится строго вокруг самих переменных.
+ */
+static struct k_spinlock ui_lock;
 static int64_t last_batt_render_ms;
 static int64_t last_mac_render_ms;
 static int64_t last_bt_render_ms;
+
+static void mark_rendered(int64_t *stamp) {
+    k_spinlock_key_t key = k_spin_lock(&ui_lock);
+
+    *stamp = k_uptime_get();
+
+    k_spin_unlock(&ui_lock, key);
+}
 
 /*
  * Простой: панель не трогаем совсем. Глубокий сон при этом намеренно выключен
@@ -150,7 +196,7 @@ static void render_batt_cb(struct k_work *work) {
     kbd = kbd_state;
     k_mutex_unlock(&state_mutex);
 
-    last_batt_render_ms = k_uptime_get();
+    mark_rendered(&last_batt_render_ms);
 
     int16_t left = UNKNOWN_BATT, right = UNKNOWN_BATT;
     if (kbd.left_slot >= 0) {
@@ -160,8 +206,7 @@ static void render_batt_cb(struct k_work *work) {
 
     icon_set_percent(&icon_left, left);
     icon_set_percent(&icon_right, right);
-    icon_set_percent(&icon_dongle,
-                     kbd.self_batt > 0 ? (int16_t)kbd.self_batt : (int16_t)UNKNOWN_BATT);
+    icon_set_percent(&icon_dongle, kbd.self_batt);
 
     /* Раз панель всё равно проснулась — подтянем и метрики мака. */
     request_mac_render();
@@ -174,7 +219,7 @@ static void render_mac_cb(struct k_work *work) {
     host = host_state;
     k_mutex_unlock(&state_mutex);
 
-    last_mac_render_ms = k_uptime_get();
+    mark_rendered(&last_mac_render_ms);
 
     char buf[48];
 
@@ -205,7 +250,7 @@ static void render_mac_cb(struct k_work *work) {
  * свободен и ждёт сопряжения.
  */
 static void render_bt_cb(struct k_work *work) {
-    last_bt_render_ms = k_uptime_get();
+    mark_rendered(&last_bt_render_ms);
 
     const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
     char buf[16];
@@ -320,34 +365,52 @@ K_WORK_DELAYABLE_DEFINE(batt_work, render_batt_cb);
 K_WORK_DELAYABLE_DEFINE(mac_work, render_mac_cb);
 K_WORK_DELAYABLE_DEFINE(bt_work, render_bt_cb);
 
-static void schedule(struct k_work_delayable *work, int64_t last_ms, int32_t min_gap,
+/* Отметка передаётся указателем: читать её надо под тем же спинлоком, под
+   которым её пишет mark_rendered() из очереди дисплея. */
+static void schedule(struct k_work_delayable *work, const int64_t *last_ms, int32_t min_gap,
                      int32_t coalesce) {
-    if (!zmk_display_is_initialized() || ui_suspended) {
+    if (!zmk_display_is_initialized()) {
         return;
     }
 
-    const int64_t since = k_uptime_get() - last_ms;
+    k_spinlock_key_t key = k_spin_lock(&ui_lock);
+    const bool suspended = ui_suspended;
+    const int64_t since = k_uptime_get() - *last_ms;
+    k_spin_unlock(&ui_lock, key);
+
+    if (suspended) {
+        return;
+    }
+
     const int32_t delay = (since >= min_gap) ? coalesce : (int32_t)(min_gap - since);
 
     k_work_schedule_for_queue(zmk_display_work_q(), work, K_MSEC(delay));
 }
 
 static void request_layer_render(void) {
-    if (zmk_display_is_initialized() && !ui_suspended) {
+    if (!zmk_display_is_initialized()) {
+        return;
+    }
+
+    k_spinlock_key_t key = k_spin_lock(&ui_lock);
+    const bool suspended = ui_suspended;
+    k_spin_unlock(&ui_lock, key);
+
+    if (!suspended) {
         k_work_reschedule_for_queue(zmk_display_work_q(), &layer_work, K_MSEC(LAYER_SETTLE_MS));
     }
 }
 
 static void request_batt_render(void) {
-    schedule(&batt_work, last_batt_render_ms, BATT_MIN_GAP_MS, BLOCK_COALESCE_MS);
+    schedule(&batt_work, &last_batt_render_ms, BATT_MIN_GAP_MS, BLOCK_COALESCE_MS);
 }
 
 static void request_mac_render(void) {
-    schedule(&mac_work, last_mac_render_ms, MAC_MIN_GAP_MS, MAC_PIGGYBACK_DELAY_MS);
+    schedule(&mac_work, &last_mac_render_ms, MAC_MIN_GAP_MS, MAC_PIGGYBACK_DELAY_MS);
 }
 
 static void request_bt_render(void) {
-    schedule(&bt_work, last_bt_render_ms, BT_MIN_GAP_MS, BT_COALESCE_MS);
+    schedule(&bt_work, &last_bt_render_ms, BT_MIN_GAP_MS, BT_COALESCE_MS);
 }
 
 /*
@@ -362,11 +425,24 @@ static void request_bt_render(void) {
 #define WAKE_RENDER_DELAY_MS 1000
 
 static void ui_set_suspended(bool suspended) {
+    k_spinlock_key_t key = k_spin_lock(&ui_lock);
+
     if (ui_suspended == suspended) {
+        k_spin_unlock(&ui_lock, key);
         return;
     }
 
     ui_suspended = suspended;
+
+    /* Обнуляем отметки прямо здесь, пока держим замок: иначе ограничители
+       задержали бы первую отрисовку после пробуждения. */
+    if (!suspended) {
+        last_batt_render_ms = 0;
+        last_mac_render_ms = 0;
+        last_bt_render_ms = 0;
+    }
+
+    k_spin_unlock(&ui_lock, key);
 
     if (suspended) {
         k_work_cancel_delayable(&layer_work);
@@ -375,10 +451,6 @@ static void ui_set_suspended(bool suspended) {
         k_work_cancel_delayable(&bt_work);
         return;
     }
-
-    last_batt_render_ms = 0;
-    last_mac_render_ms = 0;
-    last_bt_render_ms = 0;
 
     if (!zmk_display_is_initialized()) {
         return;
@@ -419,7 +491,7 @@ void dongle_ui_fill_state(struct dongle_public_state *out) {
     out->layer = zmk_keymap_highest_layer_active();
     out->batt_left = (left < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)left;
     out->batt_right = (right < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)right;
-    out->batt_dongle = kbd.self_batt > 0 ? kbd.self_batt : DONGLE_BATT_UNKNOWN;
+    out->batt_dongle = (kbd.self_batt < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)kbd.self_batt;
     out->left_slot = (kbd.left_slot < 0) ? 0xFF : (uint8_t)kbd.left_slot;
 
     const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
@@ -472,7 +544,7 @@ static int dongle_ui_event_listener(const zmk_event_t *eh) {
         request_bt_render();
         return ZMK_EV_EVENT_BUBBLE;
     } else if (as_zmk_battery_state_changed(eh) != NULL) {
-        uint8_t soc = zmk_battery_state_of_charge();
+        const int16_t soc = (int16_t)zmk_battery_state_of_charge();
         if (soc != kbd_state.self_batt) {
             kbd_state.self_batt = soc;
             dirty = true;
@@ -662,11 +734,6 @@ lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_t *screen = lv_obj_create(NULL);
     lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_pad_all(screen, 0, LV_PART_MAIN);
-
-    kbd_state.left_slot = -1;
-    for (size_t i = 0; i < ARRAY_SIZE(kbd_state.slot_batt); i++) {
-        kbd_state.slot_batt[i] = UNKNOWN_BATT;
-    }
 
     /*
      * Ряд батарей. Блок левой половины стоит СПРАВА, правой — слева: так они

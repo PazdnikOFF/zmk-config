@@ -18,6 +18,10 @@
  *   1. Раз в REPORT_PERIOD по каждому соединению — сторона, интервал,
  *      latency, таймаут и RSSI.
  *   2. Каждый разрыв сплит-линка сразу, с причиной.
+ *   4. Направленная реклама, которую видит скан донгла. Отвечает на вопрос
+ *      «почему после перезагрузки донгла одна половинка не цепляется сама»:
+ *      половинка с бондом рекламирует только направленно, и если её адреса в
+ *      этом логе нет — она молчит сама, а донгл тут ни при чём.
  *   3. Пачки: события одной половинки, пришедшие не дальше BATCH_GAP_MS друг
  *      от друга. Человек так печатать не может — дребезг одной клавиши 5 мс, —
  *      зато так выглядит линк, который постоял и выплюнул накопленное разом.
@@ -133,6 +137,7 @@ static char side_of_slot(int slot) {
 static struct {
     const struct bt_conn *conn;
     int8_t slot;
+    char addr[BT_ADDR_LE_STR_LEN];
 } known[SLOTS];
 
 static const char *reason_name(uint8_t reason) {
@@ -167,8 +172,9 @@ static void on_connected(struct bt_conn *conn, uint8_t err) {
 
     known[slot].conn = conn;
     known[slot].slot = slot;
+    bt_addr_le_to_str(bt_conn_get_dst(conn), known[slot].addr, sizeof(known[slot].addr));
 
-    LOG_WRN("link %c slot=%d подключена", side_of_slot(slot), slot);
+    LOG_WRN("link %c slot=%d подключена %s", side_of_slot(slot), slot, known[slot].addr);
 }
 
 static void on_disconnected(struct bt_conn *conn, uint8_t reason) {
@@ -185,11 +191,37 @@ static void on_disconnected(struct bt_conn *conn, uint8_t reason) {
         const uint32_t total = ++drops[slot];
         k_spin_unlock(&stats_lock, key);
 
-        LOG_WRN("link %c slot=%d РАЗРЫВ reason=0x%02x %s (всего %u)", side_of_slot(slot), slot,
-                reason, reason_name(reason), total);
+        LOG_WRN("link %c slot=%d РАЗРЫВ %s reason=0x%02x %s (всего %u)", side_of_slot(slot), slot,
+                known[i].addr, reason, reason_name(reason), total);
         return;
     }
 }
+
+/* --- что видит скан ------------------------------------------------------- */
+
+/*
+ * ZMK пишет увиденное при скане только на уровне DBG, а в отладочной сборке
+ * стоит INF. Здесь — только направленная реклама: её шлёт половинка с бондом,
+ * и контроллер пропускает лишь адресованную нам, так что посторонних тут почти
+ * не бывает. Фильтр дубликатов у скана ZMK включён — каждый адрес появится раз
+ * за сеанс скана и лог не зальёт.
+ */
+static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_simple *buf) {
+    ARG_UNUSED(buf);
+
+    if (info->adv_type != BT_GAP_ADV_TYPE_ADV_DIRECT_IND) {
+        return;
+    }
+
+    char addr[BT_ADDR_LE_STR_LEN];
+
+    bt_addr_le_to_str(info->addr, addr, sizeof(addr));
+    LOG_WRN("scan: направленная реклама от %s rssi=%d", addr, info->rssi);
+}
+
+static struct bt_le_scan_cb scan_cb = {
+    .recv = scan_recv,
+};
 
 BT_CONN_CB_DEFINE(link_stats_cb) = {
     .connected = on_connected,
@@ -296,6 +328,8 @@ static void link_stats_thread(void *p1, void *p2, void *p3) {
     ARG_UNUSED(p1);
     ARG_UNUSED(p2);
     ARG_UNUSED(p3);
+
+    bt_le_scan_cb_register(&scan_cb);
 
     while (true) {
         k_sleep(REPORT_PERIOD);

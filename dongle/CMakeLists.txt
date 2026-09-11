@@ -14,3 +14,13 @@ if(CONFIG_SWEEP_DONGLE_UI)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON src/reset_reason.c)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_LINKS src/link_stats.c)
 endif()
+
+# Половинки. Библиотека названа явно: блок выше создаёт безымянную
+# zephyr_library(), и в одной сборке двух с одинаковым именем быть не должно.
+# Сейчас блоки взаимоисключающие (донгл против половинок), но полагаться на
+# это ни к чему.
+if(CONFIG_SWEEP_SPLIT_READVERTISE)
+  zephyr_library_named(sweep_split_readvertise)
+  zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
+  zephyr_library_sources(src/split_readvertise.c)
+endif()

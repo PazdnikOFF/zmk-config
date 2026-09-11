@@ -25,6 +25,21 @@ config SWEEP_SPLIT_READVERTISE
       low-duty-направленная реклама, в которую ZMK переходит сам. Если она
       уже идёт, Zephyr отвечает -EALREADY и ничего не происходит.
 
+config SWEEP_HALF_DEBUG_STATS
+    bool "Логировать на половинке состояние отправки нажатий"
+    depends on ZMK_SPLIT_BLE && !ZMK_SPLIT_ROLE_CENTRAL
+    select HWINFO
+    default n
+    help
+      Отвечает на «после перезагрузки донгла линк к половинке есть, а
+      нажатий нет». Раз в пару секунд пишет, подписан ли донгл на нажатия
+      (bt_gatt_is_subscribed), занята ли работа отправки ZMK и насколько
+      заполнена очередь снимков. Подписки нет — не подписался донгл; подписка
+      есть, а работа отправки висит — застряла сама половинка.
+
+      Плюс причина последней перезагрузки, как у донгла. Нужен лог по USB,
+      то есть снипет zmk-usb-logging.
+
 if SWEEP_DONGLE_UI
 
 config SWEEP_DONGLE_HOST_LINK_CDC

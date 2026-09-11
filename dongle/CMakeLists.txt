@@ -19,8 +19,10 @@ endif()
 # zephyr_library(), и в одной сборке двух с одинаковым именем быть не должно.
 # Сейчас блоки взаимоисключающие (донгл против половинок), но полагаться на
 # это ни к чему.
-if(CONFIG_SWEEP_SPLIT_READVERTISE)
-  zephyr_library_named(sweep_split_readvertise)
+if(CONFIG_SWEEP_SPLIT_READVERTISE OR CONFIG_SWEEP_HALF_DEBUG_STATS)
+  zephyr_library_named(sweep_split_half)
   zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
-  zephyr_library_sources(src/split_readvertise.c)
+  zephyr_library_sources_ifdef(CONFIG_SWEEP_SPLIT_READVERTISE src/split_readvertise.c)
+  # reset_reason.c от донгла не зависит, половинке он нужен тот же.
+  zephyr_library_sources_ifdef(CONFIG_SWEEP_HALF_DEBUG_STATS src/half_stats.c src/reset_reason.c)
 endif()

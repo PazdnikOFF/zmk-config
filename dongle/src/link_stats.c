@@ -22,6 +22,11 @@
  *      «почему после перезагрузки донгла одна половинка не цепляется сама»:
  *      половинка с бондом рекламирует только направленно, и если её адреса в
  *      этом логе нет — она молчит сама, а донгл тут ни при чём.
+ *   5. Жизнь каждого линка с момента подключения: сколько он живёт, сколько
+ *      с него пришло нажатий и событий батареи, какой уровень шифрования.
+ *      Отвечает на «линк есть, а нажатий нет»: после перезагрузки донгла вся
+ *      его настройка проходит, пока USB ещё не подключён и логу некуда
+ *      писать, так что увидеть её можно только по накопленному итогу.
  *   3. Пачки: события одной половинки, пришедшие не дальше BATCH_GAP_MS друг
  *      от друга. Человек так печатать не может — дребезг одной клавиши 5 мс, —
  *      зато так выглядит линк, который постоял и выплюнул накопленное разом.
@@ -46,6 +51,7 @@
 #include <zephyr/sys/byteorder.h>
 
 #include <zmk/event_manager.h>
+#include <zmk/events/battery_state_changed.h>
 #include <zmk/events/position_state_changed.h>
 #include <zmk/split/central.h>
 
@@ -65,6 +71,25 @@ int peripheral_slot_index_for_conn(struct bt_conn *conn);
 
 #define SLOTS ZMK_SPLIT_CENTRAL_PERIPHERAL_COUNT
 
+/*
+ * Что известно о каждом слоте с момента подключения.
+ *
+ * К моменту нашего колбэка disconnected ZMK уже освободил слот: его колбэк
+ * зарегистрирован через bt_conn_cb_register, а Zephyr зовёт такие раньше
+ * статических BT_CONN_CB_DEFINE. Поэтому слот запоминается при подключении.
+ * Указатель хранится без ссылки — он только сравнивается и стирается на
+ * разрыве, пока объект соединения ещё жив. Счётчики под stats_lock.
+ */
+static struct {
+    const struct bt_conn *conn;
+    int8_t slot;
+    char addr[BT_ADDR_LE_STR_LEN];
+    int64_t up_ms;
+    uint32_t keys;
+    uint32_t batt;
+    uint8_t sec;
+} known[SLOTS];
+
 /* --- пачки нажатий --------------------------------------------------------- */
 
 struct slot_stats {
@@ -82,6 +107,19 @@ static struct slot_stats stats[SLOTS];
 static uint32_t drops[SLOTS];
 
 static int link_stats_listener(const zmk_event_t *eh) {
+    const struct zmk_peripheral_battery_state_changed *bev =
+        as_zmk_peripheral_battery_state_changed(eh);
+
+    /* Ноль ZMK шлёт сам на разрыве — это не событие с половинки. */
+    if (bev != NULL) {
+        if (bev->source < SLOTS && bev->state_of_charge != 0) {
+            k_spinlock_key_t key = k_spin_lock(&stats_lock);
+            known[bev->source].batt++;
+            k_spin_unlock(&stats_lock, key);
+        }
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+
     const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
 
     /* Локальные события (source 255) и чужие источники не интересны. */
@@ -102,6 +140,7 @@ static int link_stats_listener(const zmk_event_t *eh) {
     s->max_run = MAX(s->max_run, s->run);
     s->last_ms = ev->timestamp;
     s->keys++;
+    known[ev->source].keys++;
 
     k_spin_unlock(&stats_lock, key);
 
@@ -110,6 +149,7 @@ static int link_stats_listener(const zmk_event_t *eh) {
 
 ZMK_LISTENER(link_stats, link_stats_listener);
 ZMK_SUBSCRIPTION(link_stats, zmk_position_state_changed);
+ZMK_SUBSCRIPTION(link_stats, zmk_peripheral_battery_state_changed);
 
 /* --- сторона по слоту ------------------------------------------------------ */
 
@@ -126,19 +166,6 @@ static char side_of_slot(int slot) {
 }
 
 /* --- подключения и разрывы ------------------------------------------------- */
-
-/*
- * К моменту нашего колбэка disconnected ZMK уже освободил слот: его колбэк
- * зарегистрирован через bt_conn_cb_register, а Zephyr зовёт такие раньше
- * статических BT_CONN_CB_DEFINE. Поэтому слот запоминается при подключении.
- * Указатель хранится без ссылки — он только сравнивается и стирается на
- * разрыве, пока объект соединения ещё жив.
- */
-static struct {
-    const struct bt_conn *conn;
-    int8_t slot;
-    char addr[BT_ADDR_LE_STR_LEN];
-} known[SLOTS];
 
 static const char *reason_name(uint8_t reason) {
     switch (reason) {
@@ -173,6 +200,13 @@ static void on_connected(struct bt_conn *conn, uint8_t err) {
     known[slot].conn = conn;
     known[slot].slot = slot;
     bt_addr_le_to_str(bt_conn_get_dst(conn), known[slot].addr, sizeof(known[slot].addr));
+
+    k_spinlock_key_t key = k_spin_lock(&stats_lock);
+    known[slot].up_ms = k_uptime_get();
+    known[slot].keys = 0;
+    known[slot].batt = 0;
+    known[slot].sec = BT_SECURITY_L1;
+    k_spin_unlock(&stats_lock, key);
 
     LOG_WRN("link %c slot=%d подключена %s", side_of_slot(slot), slot, known[slot].addr);
 }
@@ -223,9 +257,29 @@ static struct bt_le_scan_cb scan_cb = {
     .recv = scan_recv,
 };
 
+/* ZMK подписывается на нажатия половинки только после шифрования, так что
+   застрявший на L1 линк объясняет «связь есть, нажатий нет» сам по себе. */
+static void on_security_changed(struct bt_conn *conn, bt_security_t level,
+                                enum bt_security_err err) {
+    for (int i = 0; i < SLOTS; i++) {
+        if (known[i].conn != conn) {
+            continue;
+        }
+
+        known[i].sec = level;
+
+        if (err != BT_SECURITY_ERR_SUCCESS) {
+            LOG_WRN("link %c slot=%d шифрование не удалось: level %u err %d",
+                    side_of_slot(known[i].slot), known[i].slot, level, err);
+        }
+        return;
+    }
+}
+
 BT_CONN_CB_DEFINE(link_stats_cb) = {
     .connected = on_connected,
     .disconnected = on_disconnected,
+    .security_changed = on_security_changed,
 };
 
 /* --- периодический отчёт --------------------------------------------------- */
@@ -290,10 +344,21 @@ static void report_link(struct bt_conn *conn) {
 
     if (info.role == BT_CONN_ROLE_CENTRAL) {
         const int slot = peripheral_slot_index_for_conn(conn);
+        uint32_t up_s = 0, keys = 0, batt = 0;
+        uint8_t sec = 0;
 
-        LOG_WRN("link %c slot=%d int=%u.%02ums lat=%u to=%ums rssi=%d%s", side_of_slot(slot), slot,
-                int_x100 / 100, int_x100 % 100, info.le.latency, info.le.timeout * 10, rssi,
-                have_rssi ? "" : "(нет)");
+        if (slot >= 0 && slot < SLOTS && known[slot].conn == conn) {
+            k_spinlock_key_t key = k_spin_lock(&stats_lock);
+            up_s = (uint32_t)((k_uptime_get() - known[slot].up_ms) / 1000);
+            keys = known[slot].keys;
+            batt = known[slot].batt;
+            sec = known[slot].sec;
+            k_spin_unlock(&stats_lock, key);
+        }
+
+        LOG_WRN("link %c slot=%d int=%u.%02ums lat=%u to=%ums rssi=%d%s up=%us keys=%u batt=%u sec=%u",
+                side_of_slot(slot), slot, int_x100 / 100, int_x100 % 100, info.le.latency,
+                info.le.timeout * 10, rssi, have_rssi ? "" : "(нет)", up_s, keys, batt, sec);
     } else {
         LOG_WRN("link HOST int=%u.%02ums lat=%u to=%ums rssi=%d%s", int_x100 / 100, int_x100 % 100,
                 info.le.latency, info.le.timeout * 10, rssi, have_rssi ? "" : "(нет)");

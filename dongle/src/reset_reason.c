@@ -29,9 +29,11 @@
  * поддерживаемым (drivers/hwinfo/hwinfo_nrf.c). RESET_BROWNOUT и RESET_POR он
  * не выдаёт никогда, поэтому их здесь и нет.
  *
- * Значение снимается на старте и печатается с задержкой: лог уезжает во второй
- * порт CDC, который поднимается не мгновенно, а до него сообщение просто лежит
- * в отложенном буфере.
+ * Значение снимается на старте и печатается с задержкой, а потом ещё
+ * повторяется: лог уезжает во второй порт CDC, и хост открывает его не сразу.
+ * На живом перетыкании 11.09.2026 порт добрался до сборщика только на 26-й
+ * секунде, и единственная печать на 4-й ушла в никуда — а это ровно тот
+ * случай, ради которого файл и написан.
  */
 
 #include <zephyr/drivers/hwinfo.h>
@@ -41,15 +43,16 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-/* Заведомо больше, чем нужно порту CDC на появление и хосту на его открытие. */
 #define REPORT_DELAY K_MSEC(4000)
+#define REPORT_REPEAT K_SECONDS(30)
+/* 20 раз по 30 секунд — десять минут, дальше лог не засоряем. */
+#define REPORT_TIMES 20
 
 static uint32_t cause;
 static int cause_err;
+static int reports_left = REPORT_TIMES;
 
-static void report(struct k_work *work) {
-    ARG_UNUSED(work);
-
+static void print_cause(void) {
     if (cause_err != 0) {
         LOG_WRN("reset: причину получить не удалось (%d)", cause_err);
         return;
@@ -65,6 +68,14 @@ static void report(struct k_work *work) {
             (cause & RESET_SOFTWARE) ? " SOFTWARE" : "", (cause & RESET_WATCHDOG) ? " WATCHDOG" : "",
             (cause & RESET_CPU_LOCKUP) ? " LOCKUP" : "", (cause & RESET_DEBUG) ? " DEBUG" : "",
             (cause & RESET_LOW_POWER_WAKE) ? " WAKE" : "");
+}
+
+static void report(struct k_work *work) {
+    print_cause();
+
+    if (--reports_left > 0) {
+        k_work_schedule(k_work_delayable_from_work(work), REPORT_REPEAT);
+    }
 }
 
 static K_WORK_DELAYABLE_DEFINE(report_work, report);

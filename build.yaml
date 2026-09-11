@@ -49,3 +49,12 @@ include:
     snippet: zmk-usb-logging
     cmake-args: -DCONFIG_SWEEP_DONGLE_DEBUG_LATENCY=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_SWEEP_DONGLE_DEBUG_LINKS=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
     artifact-name: sweep_dongle_debug
+
+  # Диагностика правой половинки: лог по USB плюс состояние отправки нажатий
+  # и причина перезагрузки. Сценарий, ради которого появилась: после
+  # перезагрузки донгла линк к правой есть, а нажатий с неё нет до её ресета.
+  - board: nice_nano_v2
+    shield: cradio_right
+    snippet: zmk-usb-logging
+    cmake-args: -DCONFIG_SWEEP_HALF_DEBUG_STATS=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
+    artifact-name: cradio_right_debug

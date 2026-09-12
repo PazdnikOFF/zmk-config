@@ -22,6 +22,12 @@
  *      «почему после перезагрузки донгла одна половинка не цепляется сама»:
  *      половинка с бондом рекламирует только направленно, и если её адреса в
  *      этом логе нет — она молчит сама, а донгл тут ни при чём.
+ *   6. Путь нажатий к хосту по BLE (app/src/hog.c) с историей С ЗАГРУЗКИ:
+ *      максимальная глубина очереди отчётов, самый долгий затык отправки,
+ *      число затыков, смены параметров линка к хосту. История нужна потому,
+ *      что задержка приходит на батарее, когда лог некуда писать; воткнутый
+ *      после этого кабель донгл не перезагружает, и первый же отчёт покажет,
+ *      что было.
  *   5. Жизнь каждого линка с момента подключения: сколько он живёт, сколько
  *      с него пришло нажатий и событий батареи, какой уровень шифрования.
  *      Отвечает на «линк есть, а нажатий нет»: после перезагрузки донгла вся
@@ -66,6 +72,18 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
  */
 int peripheral_slot_index_for_conn(struct bt_conn *conn);
 
+/*
+ * Путь нажатий к хосту по BLE, app/src/hog.c. Отчёт кладётся в очередь
+ * zmk_hog_keyboard_msgq (CONFIG_ZMK_BLE_KEYBOARD_REPORT_QUEUE_SIZE, 20), работа
+ * hog_keyboard_work в своей очереди отправляет его через bt_gatt_notify_cb, а
+ * тот ждёт буфер без таймаута. Встал линк к хосту — очередь растёт, работа
+ * висит: снаружи это «текст выводится с задержкой с обеих половинок». Оба
+ * объекта глобальные (K_MSGQ_DEFINE и K_WORK_DEFINE не делают static), но в
+ * заголовках не объявлены.
+ */
+extern struct k_msgq zmk_hog_keyboard_msgq;
+extern struct k_work hog_keyboard_work;
+
 #define REPORT_PERIOD K_SECONDS(10)
 #define BATCH_GAP_MS 1
 
@@ -90,6 +108,67 @@ static struct {
     uint8_t sec;
 } known[SLOTS];
 
+/* --- путь нажатий к хосту ---------------------------------------------------- */
+
+/*
+ * Выборка из таймера (контекст прерывания): чтение счётчика очереди и
+ * k_work_busy_get оба безопасны в ISR, общий спинлок тоже. Отправка одного
+ * отчёта при живом линке занимает доли миллисекунды, так что работа, занятая
+ * дольше HID_STALL_MS, стоит в ожидании буфера — это затык.
+ */
+#define HID_SAMPLE_MS 20
+#define HID_STALL_MS 100
+
+struct hid_stats {
+    uint32_t q_max;
+    int64_t q_max_at;
+    uint32_t q_max_window;
+    uint32_t busy_run;
+    uint32_t busy_max_ms;
+    int64_t busy_max_at;
+    uint32_t stalls;
+    uint32_t host_updates;
+};
+
+static struct hid_stats hid;
+
+static struct k_spinlock stats_lock;
+
+static void hid_sample(struct k_timer *timer) {
+    ARG_UNUSED(timer);
+
+    const uint32_t q = k_msgq_num_used_get(&zmk_hog_keyboard_msgq);
+    const bool busy = (k_work_busy_get(&hog_keyboard_work) & K_WORK_RUNNING) != 0;
+    const int64_t now = k_uptime_get();
+
+    k_spinlock_key_t key = k_spin_lock(&stats_lock);
+
+    if (q > hid.q_max) {
+        hid.q_max = q;
+        hid.q_max_at = now;
+    }
+    hid.q_max_window = MAX(hid.q_max_window, q);
+
+    if (busy) {
+        hid.busy_run++;
+    } else if (hid.busy_run > 0) {
+        const uint32_t ms = hid.busy_run * HID_SAMPLE_MS;
+
+        if (ms >= HID_STALL_MS) {
+            hid.stalls++;
+        }
+        if (ms > hid.busy_max_ms) {
+            hid.busy_max_ms = ms;
+            hid.busy_max_at = now;
+        }
+        hid.busy_run = 0;
+    }
+
+    k_spin_unlock(&stats_lock, key);
+}
+
+static K_TIMER_DEFINE(hid_timer, hid_sample, NULL);
+
 /* --- пачки нажатий --------------------------------------------------------- */
 
 struct slot_stats {
@@ -101,8 +180,7 @@ struct slot_stats {
 };
 
 /* Пишется из системной очереди (там ZMK поднимает события половинок),
-   читается и обнуляется из потока отчёта. */
-static struct k_spinlock stats_lock;
+   читается и обнуляется из потока отчёта. Спинлок общий, объявлен выше. */
 static struct slot_stats stats[SLOTS];
 static uint32_t drops[SLOTS];
 
@@ -276,10 +354,31 @@ static void on_security_changed(struct bt_conn *conn, bt_security_t level,
     }
 }
 
+/* Параметры линка к хосту назначает хост и вправе поменять когда угодно;
+   host_params.c просит нужные один раз после подключения. */
+static void on_param_updated(struct bt_conn *conn, uint16_t interval, uint16_t latency,
+                             uint16_t timeout) {
+    struct bt_conn_info info;
+
+    if (bt_conn_get_info(conn, &info) != 0 || info.role != BT_CONN_ROLE_PERIPHERAL) {
+        return;
+    }
+
+    k_spinlock_key_t key = k_spin_lock(&stats_lock);
+    const uint32_t n = ++hid.host_updates;
+    k_spin_unlock(&stats_lock, key);
+
+    const uint32_t int_x100 = (uint32_t)interval * 125;
+
+    LOG_WRN("link HOST параметры сменились (%u-й раз): int=%u.%02ums lat=%u to=%ums", n,
+            int_x100 / 100, int_x100 % 100, latency, timeout * 10);
+}
+
 BT_CONN_CB_DEFINE(link_stats_cb) = {
     .connected = on_connected,
     .disconnected = on_disconnected,
     .security_changed = on_security_changed,
+    .le_param_updated = on_param_updated,
 };
 
 /* --- периодический отчёт --------------------------------------------------- */
@@ -365,6 +464,22 @@ static void report_link(struct bt_conn *conn) {
     }
 }
 
+static void report_hid(void) {
+    const int64_t now = k_uptime_get();
+
+    k_spinlock_key_t key = k_spin_lock(&stats_lock);
+    const struct hid_stats snap = hid;
+    hid.q_max_window = 0;
+    k_spin_unlock(&stats_lock, key);
+
+    LOG_WRN("hid: очередь окно=%u макс=%u (%us назад) затык макс=%ums (%us назад) затыков=%u "
+            "смен_параметров=%u аптайм=%us",
+            snap.q_max_window, snap.q_max,
+            snap.q_max ? (uint32_t)((now - snap.q_max_at) / 1000) : 0, snap.busy_max_ms,
+            snap.busy_max_ms ? (uint32_t)((now - snap.busy_max_at) / 1000) : 0, snap.stalls,
+            snap.host_updates, (uint32_t)(now / 1000));
+}
+
 static void report_keys(void) {
     struct slot_stats snap[SLOTS];
 
@@ -395,6 +510,7 @@ static void link_stats_thread(void *p1, void *p2, void *p3) {
     ARG_UNUSED(p3);
 
     bt_le_scan_cb_register(&scan_cb);
+    k_timer_start(&hid_timer, K_MSEC(HID_SAMPLE_MS), K_MSEC(HID_SAMPLE_MS));
 
     while (true) {
         k_sleep(REPORT_PERIOD);
@@ -409,6 +525,7 @@ static void link_stats_thread(void *p1, void *p2, void *p3) {
         }
 
         report_keys();
+        report_hid();
     }
 }
 

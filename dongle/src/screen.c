@@ -74,6 +74,7 @@ static lv_obj_t *lbl_bt;
 static lv_obj_t *lbl_layout;
 static lv_obj_t *lbl_cpu_mem;
 static lv_obj_t *lbl_disk_batt;
+static lv_obj_t *lbl_speed;
 
 K_MUTEX_DEFINE(state_mutex);
 
@@ -133,6 +134,7 @@ static struct k_spinlock ui_lock;
 static int64_t last_batt_render_ms;
 static int64_t last_mac_render_ms;
 static int64_t last_bt_render_ms;
+static int64_t last_speed_render_ms;
 
 static void mark_rendered(int64_t *stamp) {
     k_spinlock_key_t key = k_spin_lock(&ui_lock);
@@ -212,6 +214,27 @@ static void render_batt_cb(struct k_work *work) {
     request_mac_render();
 }
 
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_TYPING_SPEED)
+/*
+ * Скорость печати живёт в строке MAC: там между подписью и раскладкой пусто,
+ * а полоса и так обновляется попутно с метриками мака. Округление до пяти
+ * убирает перерисовки ради дрожания последней цифры.
+ */
+static void update_speed_label(void) {
+    const int cpm = typing_speed_cpm();
+    char buf[16];
+
+    if (cpm < 0) {
+        buf[0] = '\0';
+    } else {
+        snprintf(buf, sizeof(buf), "%d cpm", MIN((cpm + 2) / 5 * 5, 9995));
+    }
+    set_text_if_changed(lbl_speed, buf);
+}
+#else
+static inline void update_speed_label(void) {}
+#endif
+
 static void render_mac_cb(struct k_work *work) {
     struct dongle_host_state host;
 
@@ -239,6 +262,14 @@ static void render_mac_cb(struct k_work *work) {
         snprintf(buf, sizeof(buf), "--G free   BAT --");
     }
     set_text_if_changed(lbl_disk_batt, buf);
+
+    /* Та же полоса: раз она всё равно обновляется, скорость едет бесплатно. */
+    update_speed_label();
+}
+
+static void render_speed_cb(struct k_work *work) {
+    mark_rendered(&last_speed_render_ms);
+    update_speed_label();
 }
 
 /*
@@ -365,6 +396,16 @@ K_WORK_DELAYABLE_DEFINE(batt_work, render_batt_cb);
 K_WORK_DELAYABLE_DEFINE(mac_work, render_mac_cb);
 K_WORK_DELAYABLE_DEFINE(bt_work, render_bt_cb);
 
+/*
+ * Скорость печати: не чаще раза в минуту и через пару секунд после просьбы,
+ * чтобы серия успела осесть. Чаще число попадает на панель попутно с
+ * метриками мака — это та же полоса, лишнего обновления там нет.
+ */
+#define SPEED_MIN_GAP_MS 60000
+#define SPEED_COALESCE_MS 2000
+
+K_WORK_DELAYABLE_DEFINE(speed_work, render_speed_cb);
+
 /* Отметка передаётся указателем: читать её надо под тем же спинлоком, под
    которым её пишет mark_rendered() из очереди дисплея. */
 static void schedule(struct k_work_delayable *work, const int64_t *last_ms, int32_t min_gap,
@@ -413,6 +454,10 @@ static void request_bt_render(void) {
     schedule(&bt_work, &last_bt_render_ms, BT_MIN_GAP_MS, BT_COALESCE_MS);
 }
 
+void dongle_ui_request_speed_render(void) {
+    schedule(&speed_work, &last_speed_render_ms, SPEED_MIN_GAP_MS, SPEED_COALESCE_MS);
+}
+
 /*
  * Уход в простой и возврат из него.
  *
@@ -449,6 +494,7 @@ static void ui_set_suspended(bool suspended) {
         k_work_cancel_delayable(&batt_work);
         k_work_cancel_delayable(&mac_work);
         k_work_cancel_delayable(&bt_work);
+        k_work_cancel_delayable(&speed_work);
         return;
     }
 
@@ -761,6 +807,10 @@ lv_obj_t *zmk_display_status_screen(void) {
     lbl_layout = make_label(screen, &lv_font_montserrat_28, 100, 120, "--");
     lv_obj_set_width(lbl_layout, 92);
     lv_obj_set_style_text_align(lbl_layout, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+
+    /* Скорость печати: между подписью MAC и раскладкой. Пустая, пока не
+       набралось ни одной серии. */
+    lbl_speed = make_label(screen, &lv_font_montserrat_16, 58, 128, "");
 
     lbl_cpu_mem = make_label(screen, &lv_font_montserrat_16, 8, 158, "CPU --   MEM --");
     lbl_disk_batt = make_label(screen, &lv_font_montserrat_16, 8, 178, "--G free   BAT --");

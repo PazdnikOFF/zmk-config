@@ -59,12 +59,12 @@
  * Windows: встроенный голосовой набор Win+H. Omarchy: voxtype, Super+Ctrl+X.
  */
 #define VOICE_MAC &kp LC(LA(LG(SPACE)))
-#define VOICE_WIN &kp LG(H)
+#define VOICE_WIN &win_voice
 #define VOICE_LNX &kp LC(LG(X))
 
 /* Смена раскладки RU/EN. Мак — Ctrl+Space, Windows — Win+Space, Omarchy —
    Ctrl+Shift (так настроено у владельца). */
-#define LANG_WIN &kp LG(SPACE)
+#define LANG_WIN &win_lang
 #define LANG_LNX &kp LC(LSHFT)
 
 /*
@@ -101,6 +101,63 @@
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings = <&kp LS(HOME) &kp BSPC>;
+        };
+    };
+
+    /*
+     * Сочетания с клавишей Win, разнесённые по времени.
+     *
+     * `&kp LG(SPACE)` отдаёт модификатор и клавишу практически одним HID-
+     * отчётом, и Windows успевает увидеть только Win: на отпускании
+     * открывается «Пуск», а язык не переключается. Меню «Пуск» в Windows
+     * открывается по ОДИНОЧНОМУ нажатию Win, поэтому любая промашка с
+     * порядком отчётов выглядит именно так.
+     *
+     * Макрос давит Win, ждёт, отдельным отчётом тапает клавишу и только потом
+     * отпускает Win. 30 мс на шаг — с запасом для обработчика оболочки и
+     * незаметно на руке: всё сочетание укладывается в 90 мс.
+     *
+     * На Маке и в Omarchy этой беды нет, там `&kp` с модификатором оставлен.
+     */
+    macros {
+        win_lang: windows_language_switch {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LGUI>
+                     , <&macro_tap &kp SPACE>
+                     , <&macro_release &kp LGUI>;
+        };
+
+        win_voice: windows_voice_typing {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LGUI>
+                     , <&macro_tap &kp H>
+                     , <&macro_release &kp LGUI>;
+        };
+
+        win_shot: windows_screenshot {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LGUI>
+                     , <&macro_tap &kp PSCRN>
+                     , <&macro_release &kp LGUI>;
+        };
+
+        win_area: windows_screenshot_area {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LGUI &kp LSHFT>
+                     , <&macro_tap &kp S>
+                     , <&macro_release &kp LSHFT &kp LGUI>;
         };
     };
 
@@ -322,7 +379,7 @@
          */
         fnc_win_layer {
             bindings = <
-&trans  &kp LC(P)  &kp LG(PSCRN)  &kp LG(LS(S))  &kp LC(R)    &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
+&trans  &kp LC(P)  &win_shot      &win_area      &kp LC(R)    &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
 &trans  &kp LC(A)  &kp LC(S)      &kp LC(O)      &kp LC(F)    &trans     &trans       &trans        &trans   &trans
 &trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    &kp LGUI   &kp LALT     &trans        &trans   &trans
                                   &trans         &trans       &trans     &trans

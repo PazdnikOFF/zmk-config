@@ -18,10 +18,11 @@ endif()
 
 # Режим ОС по профилю хоста. Отдельная библиотека: к экрану он отношения не
 # имеет и живёт на донгле независимо от того, собран ли UI.
-if(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+if(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE OR CONFIG_SWEEP_DONGLE_SINGLE_HOST)
   zephyr_library_named(sweep_dongle_os)
   zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
-  zephyr_library_sources(src/os_profile.c)
+  zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE src/os_profile.c)
+  zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_SINGLE_HOST src/host_solo.c)
 endif()
 
 # Половинки. Библиотека названа явно: блок выше создаёт безымянную

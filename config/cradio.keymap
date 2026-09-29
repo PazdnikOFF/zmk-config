@@ -150,6 +150,32 @@
                      , <&macro_release &kp LGUI>;
         };
 
+        /*
+         * Alt+F4 и Alt+Tab тоже макросами: Windows требует, чтобы Alt был
+         * зажат ДО клавиши, а одним HID-отчётом это не гарантируется.
+         * Alt+Tab одиночным тапом переключает на предыдущее окно — именно то,
+         * чего ждёшь от «переключить окно».
+         */
+        alt_f4: windows_close_window {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LALT>
+                     , <&macro_tap &kp F4>
+                     , <&macro_release &kp LALT>;
+        };
+
+        alt_tab: switch_window {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&macro_press &kp LALT>
+                     , <&macro_tap &kp TAB>
+                     , <&macro_release &kp LALT>;
+        };
+
         win_area: windows_screenshot_area {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -381,8 +407,8 @@
          */
         fnc_win_layer {
             bindings = <
-&trans  &kp LC(P)  &win_shot      &win_area      &kp LC(R)    &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
-&trans  &kp LC(A)  &kp LC(S)      &kp LC(O)      &kp LC(F)    &trans     &trans       &trans        &trans   &trans
+&trans    &kp LC(P)  &win_shot  &win_area  &alt_f4      &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
+&alt_tab  &kp LC(A)  &kp LC(S)  &kp LC(O)  &kp LC(F)    &trans     &trans       &trans        &trans   &trans
 &trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    LANG_WIN   &kp LALT     &trans        &trans   &trans
                                   &trans         &trans       &trans     &trans
             >;
@@ -399,8 +425,8 @@
          */
         fnc_lnx_layer {
             bindings = <
-&trans  &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp LC(R)    &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
-&trans  &kp LC(A)  &kp LC(S)      &kp LC(O)  &kp LC(F)    &trans    &trans       &trans        &trans   &trans
+&trans    &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp LG(W)    &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
+&alt_tab  &kp LC(A)  &kp LC(S)      &kp LC(O)  &kp LC(F)    &trans    &trans       &trans        &trans   &trans
 &trans  &kp LC(Z)  &kp LG(X)      &kp LG(C)  &kp LG(V)    LANG_LNX  &kp LALT     &trans        &trans   &trans
                                   &trans     &trans       &trans    &trans
             >;

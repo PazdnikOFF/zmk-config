@@ -16,6 +16,14 @@ if(CONFIG_SWEEP_DONGLE_UI)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_LINKS src/link_stats.c)
 endif()
 
+# Режим ОС по профилю хоста. Отдельная библиотека: к экрану он отношения не
+# имеет и живёт на донгле независимо от того, собран ли UI.
+if(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+  zephyr_library_named(sweep_dongle_os)
+  zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
+  zephyr_library_sources(src/os_profile.c)
+endif()
+
 # Половинки. Библиотека названа явно: блок выше создаёт безымянную
 # zephyr_library(), и в одной сборке двух с одинаковым именем быть не должно.
 # Сейчас блоки взаимоисключающие (донгл против половинок), но полагаться на

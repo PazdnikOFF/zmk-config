@@ -55,8 +55,19 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define RIGHT_X 144
 #define PCT_Y 46
 
-/* Имена слоёв в порядке cradio.keymap. Держать синхронно с раскладкой. */
-static const char *const layer_names[] = {"BASE", "SYM", "SYM2", "FN", "FN2"};
+/*
+ * Имена слоёв в порядке cradio.keymap. Держать синхронно с раскладкой.
+ *
+ * Слоёв больше, чем показываемых имён: под Windows и Linux у каждого рабочего
+ * слоя есть накладка, и активной оказывается именно она. Для владельца это
+ * всё тот же SYM или FN, поэтому накладки названы так же, а флаг-слои режима
+ * названы базой — сами по себе они ничего не меняют. Какой сейчас режим,
+ * пишется отдельной подписью справа.
+ */
+static const char *const layer_names[] = {
+    "BASE", "SYM", "SYM2", "FN",  "FN2",  "GAME", "BASE", "BASE",
+    "SYM",  "SYM", "SYM2", "SYM2", "FN",  "FN",   "FN2",  "FN2",
+};
 
 /* Силуэт устройства, залитый снизу пропорционально заряду. */
 struct batt_icon {
@@ -71,6 +82,9 @@ static struct batt_icon icon_right;
 
 static lv_obj_t *lbl_layer;
 static lv_obj_t *lbl_bt;
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+static lv_obj_t *lbl_os;
+#endif
 static lv_obj_t *lbl_layout;
 static lv_obj_t *lbl_cpu_mem;
 static lv_obj_t *lbl_disk_batt;
@@ -310,6 +324,24 @@ static void render_bt_cb(struct k_work *work) {
     set_text_if_changed(lbl_bt, buf);
 }
 
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+static bool os_layer_active(uint8_t index) {
+    const zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(index);
+
+    return id != ZMK_KEYMAP_LAYER_ID_INVAL && zmk_keymap_layer_active(id);
+}
+
+static const char *os_mode_name(void) {
+    if (os_layer_active(CONFIG_SWEEP_DONGLE_OS_LAYER_WIN)) {
+        return "WIN";
+    }
+    if (os_layer_active(CONFIG_SWEEP_DONGLE_OS_LAYER_LNX)) {
+        return "LNX";
+    }
+    return "MAC";
+}
+#endif
+
 /*
  * Слой рисуется отдельной работой и в своём темпе.
  *
@@ -331,6 +363,13 @@ static void render_layer_cb(struct k_work *work) {
     }
 
     set_text_if_changed(lbl_layer, buf);
+
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+    /* Режим ОС: он же говорит, какие сочетания сейчас шлёт FN-слой. Меняется
+       только при смене профиля или вручную, так что панель от него не
+       мельтешит. */
+    set_text_if_changed(lbl_os, os_mode_name());
+#endif
 
     /* Раз панель всё равно проснулась — подтянем и метрики мака. */
     request_mac_render();
@@ -796,6 +835,13 @@ lv_obj_t *zmk_display_status_screen(void) {
     /* Живёт в одной полосе со слоем — там слева пусто, а обновление полосы
        всё равно общее, так что отдельной строки это не стоит. */
     lbl_bt = make_label(screen, &lv_font_montserrat_16, 8, 86, "BT1");
+
+#if IS_ENABLED(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
+    /* Режим ОС — справа в той же полосе, симметрично профилю слева. */
+    lbl_os = make_label(screen, &lv_font_montserrat_16, 140, 86, "MAC");
+    lv_obj_set_width(lbl_os, 52);
+    lv_obj_set_style_text_align(lbl_os, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+#endif
 
     lbl_layer = make_label(screen, &lv_font_montserrat_28, 0, 76, "BASE");
     lv_obj_set_width(lbl_layer, 200);

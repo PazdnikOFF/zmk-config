@@ -9,23 +9,63 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/outputs.h>
 
-#define QWERTY 0
-#define SYM    1
-#define SYM_2  2
-#define FNC    3
-#define FNC_2  4
+#define QWERTY  0
+#define SYM     1
+#define SYM_2   2
+#define FNC     3
+#define FNC_2   4
+#define GAME    5
 
 /*
- * Вызов голосового ввода Handy: Ctrl+Alt+Cmd+Space.
+ * Режимы ОС.
  *
- * Сочетание выбрано после разбора com.apple.symbolichotkeys.plist: ни одно из
- * 34 включённых системных сочетаний macOS не использует эту комбинацию
- * модификаторов. Три модификатора вдобавок практически исключают совпадение с
- * сочетаниями внутри программ.
+ * Раскладка одна на все машины: буквы, цифры и символы от ОС не зависят.
+ * Зависят сочетания — на Маке копирование это ⌘C, в Windows Ctrl+C, в Omarchy
+ * Super+C. Поэтому базой остаётся Мак (основная машина), а под Windows и Linux
+ * поднимается ПУСТОЙ флаг-слой, сам по себе ничего не делающий. Через
+ * conditional_layers пара «флаг + рабочий слой» поднимает накладку *_W / *_L, в
+ * которой переопределены ТОЛЬКО отличающиеся клавиши, остальные &trans и
+ * проваливаются на маковские.
  *
- * Это же сочетание нужно назначить в самом Handy — клавиатура его лишь шлёт.
+ * Режим выбирается сам по BLE-профилю: профиль 1 — Мак, профиль 2 — Windows,
+ * профиль 3 — Linux (dongle/src/os_profile.c слушает смену профиля). Клавиши
+ * SYM_2 + T / G / B переключают режим вручную — это нужно при выводе по USB,
+ * где профиля нет, и чтобы поправить режим, не трогая профиль. Ручной выбор
+ * держится до следующей СМЕНЫ профиля: переподключение хоста его не сбивает.
+ *
+ * Номера слоёв ниже дублируются в Kconfig донгла (SWEEP_DONGLE_OS_LAYER_*) и в
+ * layer_names[] в dongle/src/screen.c — при перестановке слоёв править и там.
  */
-#define VOICE &kp LC(LA(LG(SPACE)))
+#define WIN      6
+#define LNX      7
+#define SYM_W    8
+#define SYM_L    9
+#define SYM_2_W 10
+#define SYM_2_L 11
+#define FNC_W   12
+#define FNC_L   13
+#define FNC_2_W 14
+#define FNC_2_L 15
+
+/*
+ * Вызов голосового ввода.
+ *
+ * Мак: Handy по Ctrl+Alt+Cmd+Space. Сочетание выбрано после разбора
+ * com.apple.symbolichotkeys.plist: ни одно из 34 включённых системных
+ * сочетаний macOS не использует эту комбинацию модификаторов. Три модификатора
+ * вдобавок практически исключают совпадение с сочетаниями внутри программ.
+ * Это же сочетание нужно назначить в самом Handy — клавиатура его лишь шлёт.
+ *
+ * Windows: встроенный голосовой набор Win+H. Omarchy: voxtype, Super+Ctrl+X.
+ */
+#define VOICE_MAC &kp LC(LA(LG(SPACE)))
+#define VOICE_WIN &kp LG(H)
+#define VOICE_LNX &kp LC(LG(X))
+
+/* Смена раскладки RU/EN. Мак — Ctrl+Space, Windows — Win+Space, Omarchy —
+   Ctrl+Shift (так настроено у владельца). */
+#define LANG_WIN &kp LG(SPACE)
+#define LANG_LNX &kp LC(LSHFT)
 
 /*
  * Выбор выхода: USB или BLE.
@@ -54,6 +94,14 @@
             flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
         };
+
+        /* ⌘⌫ с Мака: стереть до начала строки. В Windows и Linux отдельного
+           сочетания нет, поэтому выделяем до начала строки и стираем. */
+        del_bol: delete_to_line_start {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LS(HOME) &kp BSPC>;
+        };
     };
 
     /*
@@ -71,15 +119,33 @@
             timeout-ms = <50>;
             require-prior-idle-ms = <150>;
             key-positions = <32 33>;
-            bindings = <&tog 2>;
+            bindings = <&tog SYM_2>;
         };
 
         combo_fun2 {
             timeout-ms = <50>;
             require-prior-idle-ms = <150>;
             key-positions = <30 31>;
-            bindings = <&tog 4>;
+            bindings = <&tog FNC_2>;
         };
+    };
+
+    /*
+     * Накладки ОС. Поднимаются, только когда активен флаг-слой режима, и
+     * гасятся сами, как только рабочий слой отпущен. Номера накладок выше
+     * номеров своих условий — иначе ZMK брал бы биндинг с нижнего слоя.
+     */
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+
+        sym_win   { if-layers = <SYM WIN>;   then-layer = <SYM_W>;   };
+        sym_lnx   { if-layers = <SYM LNX>;   then-layer = <SYM_L>;   };
+        sym2_win  { if-layers = <SYM_2 WIN>; then-layer = <SYM_2_W>; };
+        sym2_lnx  { if-layers = <SYM_2 LNX>; then-layer = <SYM_2_L>; };
+        fnc_win   { if-layers = <FNC WIN>;   then-layer = <FNC_W>;   };
+        fnc_lnx   { if-layers = <FNC LNX>;   then-layer = <FNC_L>;   };
+        fnc2_win  { if-layers = <FNC_2 WIN>; then-layer = <FNC_2_W>; };
+        fnc2_lnx  { if-layers = <FNC_2 LNX>; then-layer = <FNC_2_L>; };
     };
 
     keymap {
@@ -95,10 +161,10 @@
 
         default_layer {
             bindings = <
-&kp Q  &kp W  &kp E  &kp R  &kp T        &kp Y           &kp U  &kp I      &kp O    &dc LBKT P
-&kp A  &kp S  &kp D  &kp F  &kp G        &kp H           &kp J  &kp K      &kp L    &dc SQT SEMI
-&kp Z  &kp X  &kp C  &kp V  &kp B        &kp N           &dc RBKT M  &kp COMMA  &kp DOT  &kp SLASH
-                     &mo 3  &kp SPACE    &kp LEFT_SHIFT  &mo 1
+&kp Q  &kp W  &kp E  &kp R  &kp T           &kp Y           &kp U       &kp I      &kp O    &dc LBKT P
+&kp A  &kp S  &kp D  &kp F  &kp G           &kp H           &kp J       &kp K      &kp L    &dc SQT SEMI
+&kp Z  &kp X  &kp C  &kp V  &kp B           &kp N           &dc RBKT M  &kp COMMA  &kp DOT  &kp SLASH
+                     &mo FNC  &kp SPACE     &kp LEFT_SHIFT  &mo SYM
             >;
         };
 
@@ -121,18 +187,19 @@
 
         /*
 
- | ` | \ | % |   |   |       |   |   |   |   |   |
- | ~ | | | ^ |   |   |       |   |   |   |   |   |
- |   |   |   |   |   |       |   |   |   |   |   |
+ | ` | \ | % |     | MAC |       |   |   |   |   |   |
+ | ~ | | | ^ |     | WIN |       |   |   |   |   |   |
+ |   |   |   |     | LNX |       |   |   |   |   |   |
              |   |   |       |   |   |
+  * Столбец T/G/B — ручной выбор режима ОС (см. комментарий о режимах выше).
   */
 
         sym_2_layer {
             bindings = <
-&kp GRAVE  &kp BSLH   &kp PRCNT  &none      &none    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
-&kp TILDE  &kp PIPE   &kp CARET  &none      &none    &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none    &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
-                                 VOICE      &none    &none              &none
+&kp GRAVE  &kp BSLH   &kp PRCNT  &none      &to QWERTY    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
+&kp TILDE  &kp PIPE   &kp CARET  &none      &to WIN       &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &to LNX       &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
+                                 VOICE_MAC  &none         &none              &none
             >;
         };
 
@@ -177,6 +244,126 @@
 &kp A      &kp S         &kp D   &kp F    &kp G             &trans  &trans  &trans  &trans  &trans
 &kp LCTRL  &kp LEFT_ALT  &trans  &trans   &kp LEFT_SHIFT    &trans  &trans  &trans  &trans  &trans
                                  &kp TAB  &kp SPACE         &trans  &trans
+            >;
+        };
+
+        /* Флаг режима Windows. Пустой: весь смысл в том, что он включён. */
+        win_flag {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+                        &trans  &trans    &trans  &trans
+            >;
+        };
+
+        /* Флаг режима Linux (Omarchy). */
+        lnx_flag {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+                        &trans  &trans    &trans  &trans
+            >;
+        };
+
+        /* SYM в Windows: смена раскладки Win+Space, большой палец ⌘ -> Ctrl. */
+        sym_win_layer {
+            bindings = <
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+                        LANG_WIN   &kp LCTRL   &trans  &trans
+            >;
+        };
+
+        /* SYM в Omarchy: смена раскладки Ctrl+Shift, большой палец ⌘ -> Ctrl. */
+        sym_lnx_layer {
+            bindings = <
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans     &trans      &trans  &trans  &trans  &trans  &trans
+                        LANG_LNX   &kp LCTRL   &trans  &trans
+            >;
+        };
+
+        /*
+         * SYM_2 в Windows: голосовой набор Win+H, ⌘N -> Ctrl+N и медиа через
+         * consumer page. K_MUTE, K_PREVIOUS, K_PLAY_PAUSE и K_NEXT с
+         * клавиатурной страницы Windows не понимает, C_* понимают все.
+         */
+        sym_2_win_layer {
+            bindings = <
+&trans  &trans  &trans  &trans     &trans    &trans      &trans      &trans      &trans  &trans
+&trans  &trans  &trans  &trans     &trans    &trans      &kp C_MUTE  &trans      &trans  &trans
+&trans  &trans  &trans  &kp LC(N)  &trans    &kp C_PREV  &kp C_PP    &kp C_NEXT  &trans  &trans
+                        VOICE_WIN  &trans    &trans      &trans
+            >;
+        };
+
+        /* SYM_2 в Omarchy: голосовой набор voxtype, ⌘N -> Ctrl+N, медиа C_*. */
+        sym_2_lnx_layer {
+            bindings = <
+&trans  &trans  &trans  &trans     &trans    &trans      &trans      &trans      &trans  &trans
+&trans  &trans  &trans  &trans     &trans    &trans      &kp C_MUTE  &trans      &trans  &trans
+&trans  &trans  &trans  &kp LC(N)  &trans    &kp C_PREV  &kp C_PP    &kp C_NEXT  &trans  &trans
+                        VOICE_LNX  &trans    &trans      &trans
+            >;
+        };
+
+        /*
+         * FNC в Windows.
+         *
+         * Снимки экрана: весь экран Win+PrtScr, область Win+Shift+S. Выход
+         * Alt+F4, Пуск — сама клавиша Win. Буфер и ⌘-сочетания -> Ctrl.
+         * ⌘ с Мака на месте M становится Alt: FNC + M + A = Alt+Tab, как ⌘Tab.
+         * ⌘стрелки Мака (начало/конец строки и документа) -> Home/End и
+         * Ctrl+Home/Ctrl+End.
+         */
+        fnc_win_layer {
+            bindings = <
+&trans  &kp LC(P)  &kp LG(PSCRN)  &kp LG(LS(S))  &kp LC(R)    &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
+&trans  &kp LC(A)  &kp LC(S)      &kp LC(O)      &kp LC(F)    &trans     &trans       &trans        &trans   &trans
+&trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    &kp LGUI   &kp LALT     &trans        &trans   &trans
+                                  &trans         &trans       &trans     &trans
+            >;
+        };
+
+        /*
+         * FNC в Omarchy.
+         *
+         * Снимки: меню захвата Super+Ctrl+C, область PrtScr. Закрыть окно
+         * Super+W, лаунчер Super+Space (как ⌘Space на Маке, поэтому &trans).
+         * Копирование Super+X/C/V — работает и в терминале, в отличие от
+         * Ctrl+C. Отмена остаётся Ctrl+Z.
+         */
+        fnc_lnx_layer {
+            bindings = <
+&trans  &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp LC(R)    &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
+&trans  &kp LC(A)  &kp LC(S)      &kp LC(O)  &kp LC(F)    &trans    &trans       &trans        &trans   &trans
+&trans  &kp LC(Z)  &kp LG(X)      &kp LG(C)  &kp LG(V)    &trans    &kp LALT     &trans        &trans   &trans
+                                  &trans     &trans       &trans    &trans
+            >;
+        };
+
+        /* FNC_2 в Windows: выход Alt+F4, ⌘⌫ -> выделить до начала строки и
+           стереть. Alt+Shift-сочетания одинаковы во всех ОС. */
+        fnc_2_win_layer {
+            bindings = <
+&trans      &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&kp LA(F4)  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans      &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &del_bol
+                            &trans  &trans    &trans  &trans
+            >;
+        };
+
+        /* FNC_2 в Omarchy: закрыть окно Super+W, ⌘⌫ -> то же, что в Windows. */
+        fnc_2_lnx_layer {
+            bindings = <
+&trans     &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&kp LG(W)  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans     &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &del_bol
+                           &trans  &trans    &trans  &trans
             >;
         };
     };

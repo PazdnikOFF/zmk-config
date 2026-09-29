@@ -40,6 +40,61 @@ config SWEEP_HALF_DEBUG_STATS
       Плюс причина последней перезагрузки, как у донгла. Нужен лог по USB,
       то есть снипет zmk-usb-logging.
 
+config SWEEP_DONGLE_OS_BY_PROFILE
+    bool "Режим ОС хоста по BLE-профилю"
+    depends on ZMK_BLE && ZMK_SPLIT_ROLE_CENTRAL
+    default y if SHIELD_SWEEP_DONGLE
+    help
+      Раскладка одна, а сочетания у ОС разные: копирование это ⌘C на Маке,
+      Ctrl+C в Windows и Super+C в Omarchy. В cradio.keymap под Windows и
+      Linux заведены пустые флаг-слои, поднимающие через conditional_layers
+      накладки с отличающимися клавишами. Здесь — связь «профиль хоста ->
+      флаг-слой», которой в ZMK нет.
+
+      Без неё режим пришлось бы держать клавишей, а состояние слоёв ZMK не
+      хранит: после каждой перезагрузки донгла (например, от выдёргивания
+      кабеля) на подключённой Windows молча оказывалась бы маковская
+      раскладка.
+
+config SWEEP_DONGLE_OS_PROFILE_WIN
+    int "Номер профиля Windows, считая с нуля"
+    depends on SWEEP_DONGLE_OS_BY_PROFILE
+    default 1
+    range 0 4
+    help
+      1 это второй профиль, тот же, что выбирает &bt BT_SEL 1, и та же
+      «BT2» на экране донгла.
+
+config SWEEP_DONGLE_OS_PROFILE_LNX
+    int "Номер профиля Linux, считая с нуля"
+    depends on SWEEP_DONGLE_OS_BY_PROFILE
+    default 2
+    range 0 4
+
+config SWEEP_DONGLE_OS_LAYER_WIN
+    int "Номер флаг-слоя Windows"
+    depends on SWEEP_DONGLE_OS_BY_PROFILE
+    default 6
+    help
+      Держать синхронно с #define WIN в config/cradio.keymap и с
+      layer_names[] в dongle/src/screen.c. Слоя с таким номером может не
+      быть — тогда модуль только пишет в лог и ничего не переключает.
+
+config SWEEP_DONGLE_OS_LAYER_LNX
+    int "Номер флаг-слоя Linux"
+    depends on SWEEP_DONGLE_OS_BY_PROFILE
+    default 7
+
+config SWEEP_DONGLE_OS_STARTUP_DELAY_MS
+    int "Задержка перед первой установкой режима, мс"
+    depends on SWEEP_DONGLE_OS_BY_PROFILE
+    default 1500
+    help
+      Профили лежат в настройках, которые ZMK читает в своём SYS_INIT, а
+      порядок инициализации между модулями ничем не задан. Поэтому первый
+      раз режим ставится отложенной работой, когда активный профиль уже
+      прочитан.
+
 if SWEEP_DONGLE_UI
 
 config SWEEP_DONGLE_HOST_LINK_CDC

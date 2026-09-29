@@ -372,7 +372,9 @@
          * FNC в Windows.
          *
          * Снимки экрана: весь экран Win+PrtScr, область Win+Shift+S. Выход
-         * Alt+F4, Пуск — сама клавиша Win. Буфер и ⌘-сочетания -> Ctrl.
+         * Alt+F4. На месте маковского ⌘Space — смена языка Win+Space
+         * макросом: у владельца ⌘Space это язык, а не Spotlight, и голая
+         * клавиша Win на этом месте открывала «Пуск». Буфер и ⌘ -> Ctrl.
          * ⌘ с Мака на месте M становится Alt: FNC + M + A = Alt+Tab, как ⌘Tab.
          * ⌘стрелки Мака (начало/конец строки и документа) -> Home/End и
          * Ctrl+Home/Ctrl+End.
@@ -381,7 +383,7 @@
             bindings = <
 &trans  &kp LC(P)  &win_shot      &win_area      &kp LC(R)    &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
 &trans  &kp LC(A)  &kp LC(S)      &kp LC(O)      &kp LC(F)    &trans     &trans       &trans        &trans   &trans
-&trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    &kp LGUI   &kp LALT     &trans        &trans   &trans
+&trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    LANG_WIN   &kp LALT     &trans        &trans   &trans
                                   &trans         &trans       &trans     &trans
             >;
         };
@@ -390,7 +392,8 @@
          * FNC в Omarchy.
          *
          * Снимки: меню захвата Super+Ctrl+C, область PrtScr. Закрыть окно
-         * Super+W, лаунчер Super+Space (как ⌘Space на Маке, поэтому &trans).
+         * Super+W. На месте маковского ⌘Space — смена языка Ctrl+Shift, как
+         * настроено у владельца в Omarchy.
          * Копирование Super+X/C/V — работает и в терминале, в отличие от
          * Ctrl+C. Отмена остаётся Ctrl+Z.
          */
@@ -398,7 +401,7 @@
             bindings = <
 &trans  &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp LC(R)    &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
 &trans  &kp LC(A)  &kp LC(S)      &kp LC(O)  &kp LC(F)    &trans    &trans       &trans        &trans   &trans
-&trans  &kp LC(Z)  &kp LG(X)      &kp LG(C)  &kp LG(V)    &trans    &kp LALT     &trans        &trans   &trans
+&trans  &kp LC(Z)  &kp LG(X)      &kp LG(C)  &kp LG(V)    LANG_LNX  &kp LALT     &trans        &trans   &trans
                                   &trans     &trans       &trans    &trans
             >;
         };

@@ -75,7 +75,29 @@ static void drop_foreign_cb(struct bt_conn *conn, void *data) {
  * connected отрабатывает до того, как стек закончит с этим соединением, и
  * ZMK в том же колбэке ещё правит рекламу.
  */
-static void drop_foreign_work_cb(struct k_work *work) { bt_conn_foreach(BT_CONN_TYPE_LE, drop_foreign_cb, NULL); }
+/*
+ * Выгоняем чужого только при ПОДКЛЮЧЁННОМ активном хосте, и это не
+ * придирка, а единственный способ не устроить карусель.
+ *
+ * ZMK рекламируется открыто даже для сопряжённого профиля: направленную
+ * рекламу там отключили из-за центральных с приватными адресами (ble.c,
+ * update_advertising, ссылка на zephyr#14984). Пока активный хост не
+ * подключён, реклама идёт — и выгнанный чужой хост цепляется обратно на неё
+ * через доли секунды, а мы выгоняем его снова. В логе это выглядело как
+ * connected/solo/connected по кругу, и между кругами ZMK писал «Not sending,
+ * not connected to active profile»: нажатия в этот момент терялись.
+ *
+ * Когда активный хост подключён, ZMK рекламу не ведёт вовсе, и вернуться
+ * чужому некуда — выгон срабатывает ровно один раз.
+ */
+static void drop_foreign_work_cb(struct k_work *work) {
+    if (!zmk_ble_active_profile_is_connected()) {
+        LOG_DBG("solo: активный хост ещё не подключён, чужих не трогаю");
+        return;
+    }
+
+    bt_conn_foreach(BT_CONN_TYPE_LE, drop_foreign_cb, NULL);
+}
 
 static K_WORK_DELAYABLE_DEFINE(drop_work, drop_foreign_work_cb);
 

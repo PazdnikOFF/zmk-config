@@ -28,10 +28,12 @@
  * проваливаются на маковские.
  *
  * Режим выбирается сам по BLE-профилю: профиль 1 — Мак, профиль 2 — Windows,
- * профиль 3 — Linux (dongle/src/os_profile.c слушает смену профиля). Клавиши
- * SYM_2 + T / G / B переключают режим вручную — это нужно при выводе по USB,
- * где профиля нет, и чтобы поправить режим, не трогая профиль. Ручной выбор
- * держится до следующей СМЕНЫ профиля: переподключение хоста его не сбивает.
+ * профиль 3 — Linux (dongle/src/os_profile.c слушает смену профиля). Вручную —
+ * парные нажатия на слое SYM_2: R+T это Мак, F+G это Windows, V+B это Linux
+ * (нужно при выводе по USB, где профиля нет). Одиночных клавиш режима тут
+ * больше нет: слой SYM_2 включается комбо больших пальцев сам, и буква из
+ * того столбца меняла режим при обычной печати. Ручной выбор держится до
+ * следующей СМЕНЫ профиля: переподключение хоста его не сбивает.
  *
  * Номера слоёв ниже дублируются в Kconfig донгла (SWEEP_DONGLE_OS_LAYER_*) и в
  * layer_names[] в dongle/src/screen.c — при перестановке слоёв править и там.
@@ -211,6 +213,40 @@
             key-positions = <30 31>;
             bindings = <&tog FNC_2>;
         };
+
+        /*
+         * Ручной выбор режима ОС — ПАРНЫМИ нажатиями, а не одиночной клавишей.
+         *
+         * Одиночные стояли на SYM_2 в столбце T/G/B и приводили к «раскладка
+         * сама меняется с mac на lnx при живом профиле BT1»: слой SYM_2
+         * включается комбо больших пальцев само, при обычном накате, и буква
+         * из этого столбца попадала по клавише режима. Пара соседних клавиш в
+         * пределах 50 мс случайно не собирается.
+         *
+         * layers перечислены все три, потому что ZMK сверяет комбо с САМЫМ
+         * ВЕРХНИМ активным слоем (combo.c: zmk_keymap_highest_layer_active), а
+         * в режимах Windows и Linux поверх SYM_2 стоит его накладка.
+         */
+        combo_os_mac {
+            timeout-ms = <50>;
+            key-positions = <3 4>;
+            bindings = <&to QWERTY>;
+            layers = <SYM_2 SYM_2_W SYM_2_L>;
+        };
+
+        combo_os_win {
+            timeout-ms = <50>;
+            key-positions = <13 14>;
+            bindings = <&to WIN>;
+            layers = <SYM_2 SYM_2_W SYM_2_L>;
+        };
+
+        combo_os_lnx {
+            timeout-ms = <50>;
+            key-positions = <23 24>;
+            bindings = <&to LNX>;
+            layers = <SYM_2 SYM_2_W SYM_2_L>;
+        };
     };
 
     /*
@@ -270,18 +306,18 @@
 
         /*
 
- | ` | \ | % |     | MAC |       |   |   |   |   |   |
- | ~ | | | ^ |     | WIN |       |   |   |   |   |   |
- |   |   |   |     | LNX |       |   |   |   |   |   |
+ | ` | \ | % |   |   |       |   |   |   |   |   |
+ | ~ | | | ^ |   |   |       |   |   |   |   |   |
+ |   |   |   |   |   |       |   |   |   |   |   |
              |   |   |       |   |   |
-  * Столбец T/G/B — ручной выбор режима ОС (см. комментарий о режимах выше).
+  * Режим ОС — парами: R+T это Мак, F+G это Windows, V+B это Linux.
   */
 
         sym_2_layer {
             bindings = <
-&kp GRAVE  &kp BSLH   &kp PRCNT  &none      &to QWERTY    &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
-&kp TILDE  &kp PIPE   &kp CARET  &none      &to WIN       &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &to LNX       &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
+&kp GRAVE  &kp BSLH   &kp PRCNT  &none      &none         &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
+&kp TILDE  &kp PIPE   &kp CARET  &none      &none         &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none         &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
                                  VOICE_MAC  &none         &none              &none
             >;
         };

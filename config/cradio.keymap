@@ -443,7 +443,7 @@
          */
         fnc_win_layer {
             bindings = <
-&trans    &kp LC(P)  &win_shot  &win_area  &alt_f4      &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &kp LA(F4)
+&trans    &kp LC(P)  &win_shot  &win_area  &kp F5       &kp HOME   &kp LC(END)  &kp LC(HOME)  &kp END  &alt_f4
 &alt_tab  &kp LC(A)  &kp LC(S)  &kp LC(O)  &kp LC(F)    &trans     &trans       &trans        &trans   &trans
 &trans  &kp LC(Z)  &kp LC(X)      &kp LC(C)      &kp LC(V)    LANG_WIN   &kp LALT     &trans        &trans   &trans
                                   &trans         &trans       &trans     &trans
@@ -461,7 +461,7 @@
          */
         fnc_lnx_layer {
             bindings = <
-&trans    &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp LG(W)    &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
+&trans    &kp LC(P)  &kp LC(LG(C))  &kp PSCRN  &kp F5       &kp HOME  &kp LC(END)  &kp LC(HOME)  &kp END  &kp LG(W)
 &alt_tab  &kp LC(A)  &kp LC(S)      &kp LC(O)  &kp LC(F)    &trans    &trans       &trans        &trans   &trans
 &trans  &kp LC(Z)  &kp LG(X)      &kp LG(C)  &kp LG(V)    LANG_LNX  &kp LALT     &trans        &trans   &trans
                                   &trans     &trans       &trans    &trans

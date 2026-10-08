@@ -219,6 +219,30 @@
         compatible = "zmk,combos";
 
         /*
+         * ВЕРНУЛИСЬ 08.10.2026. Попытка убрать комбо и переключать слои
+         * клавишей внутри слоя провалилась: &tog встал на пальцы Shift и
+         * пробела, и обычный порядок «зажать SYM, нажать Shift» стал
+         * переключать слой вместо шифта. Пока нет проверенной замены, лучше
+         * платить 50 мс на каждом третьем нажатии, чем терять Shift.
+         *
+         * Цена задержки измерена и описана в README шилда; замена будет
+         * выбрана по разбору реальных раскладок, а не на ходу.
+         */
+        combo_sym2 {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <32 33>;
+            bindings = <&tog SYM_2>;
+        };
+
+        combo_fun2 {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <30 31>;
+            bindings = <&tog FNC_2>;
+        };
+
+        /*
          * Ручной выбор режима ОС — ПАРНЫМИ нажатиями, а не одиночной клавишей.
          *
          * Одиночные стояли на SYM_2 в столбце T/G/B и приводили к «раскладка
@@ -304,7 +328,7 @@
 &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp N5  &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
 &kp HASH  &kp UNDER  &kp LPAR  &kp LBKT  &kp LBRC  &kp EQUAL  &kp QMARK  &kp SQT  &kp PLUS  &kp STAR
 &kp DLLR  &dc LS(NUMBER_6) AMPS  &kp RPAR  &kp RBKT  &kp RBRC  &kp AT  &kp EXCL  &kp DQT  &kp MINUS  &kp SLASH
-&kp LC(SPACE)  &kp LGUI  &tog SYM_2  &none
+&kp LC(SPACE)  &kp LGUI  &trans  &none
             >;
         };
 
@@ -322,7 +346,7 @@
 &kp GRAVE  &kp BSLH  &kp PRCNT  &none  &none  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
 &kp TILDE  &kp PIPE  &kp CARET  &none  &none  &kp C_VOLUME_DOWN  &kp K_MUTE  &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
 &kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none  &kp K_PREVIOUS  &kp K_PLAY_PAUSE  &kp K_NEXT  &out OUT_BLE  &studio_unlock
-VOICE_MAC  &none  &tog SYM_2  &none
+VOICE_MAC  &none  &trans  &none
             >;
         };
 
@@ -340,7 +364,7 @@ VOICE_MAC  &none  &tog SYM_2  &none
 &kp ESC  &kp LG(P)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)  &kp LG(LEFT)  &kp LG(DOWN)  &kp LG(UP)  &kp LG(RIGHT)  &kp LG(Q)
 &kp TAB  &kp LG(A)  &kp LG(S)  &kp LG(O)  &kp LG(F)  &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT  &kp BACKSPACE
 &kp CAPS  &kp LG(Z)  &kp LG(X)  &kp LG(C)  &kp LG(V)  &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
-&none  &tog FNC_2  &kp BSPC  &kp ENTER
+&none  &trans  &kp BSPC  &kp ENTER
             >;
         };
 
@@ -357,7 +381,7 @@ VOICE_MAC  &none  &tog SYM_2  &none
 &kp F1  &kp F2  &kp F3  &kp F4  &kp F5  &kp F6  &kp F7  &kp F8  &kp F9  &kp F10
 &kp LG(Q)  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))  &kp LA(LS(H))  &kp LA(LS(J))  &kp LA(LS(K))  &kp LA(LS(L))  &none
 &kp F11  &kp F22  &none  &none  &none  &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &kp LG(BACKSPACE)
-&none  &tog FNC_2  &none  &none
+&none  &trans  &none  &none
             >;
         };
 

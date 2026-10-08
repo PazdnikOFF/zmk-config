@@ -190,38 +190,33 @@
     };
 
     /*
-     * Комбо на больших пальцах переключают слои. Пока ZMK ждёт вторую клавишу
-     * комбо, нажатие придерживается до timeout-ms. require-prior-idle-ms
-     * снимает это во время печати: если за 150 мс до нажатия была другая
-     * клавиша, комбо не рассматривается и клавиша срабатывает сразу.
+     * Комбо с БОЛЬШИХ ПАЛЬЦЕВ УБРАНЫ (02.10.2026 замер, 08.10.2026 правка).
      *
-     * Замер 02.10.2026 по логу за 11 минут работы: 729 нажатий большими
-     * пальцами, из них 230 (каждое третье) придержаны на ~50 мс, остальные
-     * клавиши при этом идут за 0,1 мс. Сработало комбо за те же 11 минут НИ
-     * РАЗУ. Налог платят пробел, Shift и обе клавиши слоёв, а повод для него
-     * возникает после каждой паузы — то есть ровно тогда, когда слой
-     * переключают осознанно. Это и есть «вязкость особенно при смене слоя».
+     * ZMK придерживает нажатие клавиши, входящей в комбо, и задержка равна
+     * min(время удержания, timeout-ms) — `app/src/combo.c`, `position_state_down`
+     * захватывает событие, `cleanup`/`release_pressed_keys` отпускает. Для
+     * клавиш, которые ДЕРЖАТ (слоевые &mo, Shift), это всегда полный
+     * timeout-ms; подтверждено апстримом в zmkfirmware/zmk#2281.
      *
-     * Владелец выбрал timeout-ms 25 вместо 50: ожидание вдвое меньше, цена —
-     * оба пальца надо опускать дружнее. Побочно реже будут и случайные
-     * срабатывания, от которых залипал SYM_2.
+     * Замер на живой раскладке: 729 нажатий большими пальцами за 11 минут,
+     * 230 из них (каждое третье) задержаны на ~50 мс, остальные клавиши — 0,1 мс.
+     * Комбо за те же 11 минут не сработало ни разу. Снижение timeout-ms до 25
+     * ожидание уменьшило, но собирать комбо стало тяжело.
+     *
+     * Апстрим эту задержку не чинил: combo.c в v0.3 побайтово совпадает с main,
+     * а патчи #2494, #2765 и #2768 закрыты без слияния. Поэтому сделано так же,
+     * как у раскладок с тем же числом клавиш (urob/zmk-config — на пальцах ни
+     * одного комбо): слой переключается клавишей ВНУТРИ слоя, который и так
+     * открыт удержанием пальца.
+     *
+     * Жест остался на тех же двух пальцах:
+     *   SYM_2  — держать SYM (правый палец), нажать Shift (левый от него);
+     *   FNC_2  — держать FNC (левый палец), нажать пробел.
+     * Выключается тем же пальцем на самом слое: на SYM_2 — позиция Shift,
+     * на FNC_2 — позиция пробела.
      */
     combos {
         compatible = "zmk,combos";
-
-        combo_sym2 {
-            timeout-ms = <25>;
-            require-prior-idle-ms = <150>;
-            key-positions = <32 33>;
-            bindings = <&tog SYM_2>;
-        };
-
-        combo_fun2 {
-            timeout-ms = <25>;
-            require-prior-idle-ms = <150>;
-            key-positions = <30 31>;
-            bindings = <&tog FNC_2>;
-        };
 
         /*
          * Ручной выбор режима ОС — ПАРНЫМИ нажатиями, а не одиночной клавишей.
@@ -306,10 +301,10 @@
 
         sym_layer {
             bindings = <
-&kp NUMBER_1  &kp NUMBER_2           &kp NUMBER_3  &kp NUMBER_4   &kp N5      &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-&kp HASH      &kp UNDER              &kp LPAR      &kp LBKT       &kp LBRC    &kp EQUAL     &kp QMARK     &kp SQT       &kp PLUS      &kp STAR
-&kp DLLR      &dc LS(NUMBER_6) AMPS  &kp RPAR      &kp RBKT       &kp RBRC    &kp AT        &kp EXCL      &kp DQT       &kp MINUS     &kp SLASH
-                                                   &kp LC(SPACE)  &kp LGUI    &none         &none
+&kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp N5  &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+&kp HASH  &kp UNDER  &kp LPAR  &kp LBKT  &kp LBRC  &kp EQUAL  &kp QMARK  &kp SQT  &kp PLUS  &kp STAR
+&kp DLLR  &dc LS(NUMBER_6) AMPS  &kp RPAR  &kp RBKT  &kp RBRC  &kp AT  &kp EXCL  &kp DQT  &kp MINUS  &kp SLASH
+&kp LC(SPACE)  &kp LGUI  &tog SYM_2  &none
             >;
         };
 
@@ -324,10 +319,10 @@
 
         sym_2_layer {
             bindings = <
-&kp GRAVE  &kp BSLH   &kp PRCNT  &none      &none         &bt BT_SEL 0       &bt BT_SEL 1      &bt BT_SEL 2     &bt BT_SEL 3  &bt BT_SEL 4
-&kp TILDE  &kp PIPE   &kp CARET  &none      &none         &kp C_VOLUME_DOWN  &kp K_MUTE        &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none         &kp K_PREVIOUS     &kp K_PLAY_PAUSE  &kp K_NEXT       &out OUT_BLE  &studio_unlock
-                                 VOICE_MAC  &none         &none              &none
+&kp GRAVE  &kp BSLH  &kp PRCNT  &none  &none  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+&kp TILDE  &kp PIPE  &kp CARET  &none  &none  &kp C_VOLUME_DOWN  &kp K_MUTE  &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none  &kp K_PREVIOUS  &kp K_PLAY_PAUSE  &kp K_NEXT  &out OUT_BLE  &studio_unlock
+VOICE_MAC  &none  &tog SYM_2  &none
             >;
         };
 
@@ -342,10 +337,10 @@
 
         fnc_layer {
             bindings = <
-&kp ESC   &kp LG(P)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)    &kp LG(LEFT)   &kp LG(DOWN)      &kp LG(UP)        &kp LG(RIGHT)   &kp LG(Q)
-&kp TAB   &kp LG(A)  &kp LG(S)             &kp LG(O)             &kp LG(F)    &kp LEFT       &kp DOWN          &kp UP            &kp RIGHT       &kp BACKSPACE
-&kp CAPS  &kp LG(Z)  &kp LG(X)             &kp LG(C)             &kp LG(V)    &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
-                                           &none                 &none        &kp BSPC       &kp ENTER
+&kp ESC  &kp LG(P)  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(R)  &kp LG(LEFT)  &kp LG(DOWN)  &kp LG(UP)  &kp LG(RIGHT)  &kp LG(Q)
+&kp TAB  &kp LG(A)  &kp LG(S)  &kp LG(O)  &kp LG(F)  &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT  &kp BACKSPACE
+&kp CAPS  &kp LG(Z)  &kp LG(X)  &kp LG(C)  &kp LG(V)  &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
+&none  &tog FNC_2  &kp BSPC  &kp ENTER
             >;
         };
 
@@ -359,10 +354,10 @@
 
         fnc_2_layer {
             bindings = <
-&kp F1     &kp F2         &kp F3         &kp F4         &kp F5           &kp F6             &kp F7             &kp F8             &kp F9             &kp F10
-&kp LG(Q)  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))    &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none
-&kp F11    &kp F22        &none          &none          &none            &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &kp LG(BACKSPACE)
-                                         &none          &none            &none              &none
+&kp F1  &kp F2  &kp F3  &kp F4  &kp F5  &kp F6  &kp F7  &kp F8  &kp F9  &kp F10
+&kp LG(Q)  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))  &kp LA(LS(H))  &kp LA(LS(J))  &kp LA(LS(K))  &kp LA(LS(L))  &none
+&kp F11  &kp F22  &none  &none  &none  &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &kp LG(BACKSPACE)
+&none  &tog FNC_2  &none  &none
             >;
         };
 

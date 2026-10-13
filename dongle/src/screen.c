@@ -770,12 +770,26 @@ static K_WORK_DELAYABLE_DEFINE(housekeeping_work, housekeeping_cb);
 static bool housekeeping_phase_two;
 
 static void housekeeping_cb(struct k_work *work) {
+    if (!device_is_ready(panel_dev)) {
+        return;
+    }
+
     if (!housekeeping_phase_two) {
-        /* Фаза 1: обновить содержимое, не обращая внимания на ограничители. */
+        /*
+         * Фаза 1. Переводим драйвер на полный профиль (blanking_on) и
+         * заставляем LVGL перерисовать ВЕСЬ экран, а не только изменившиеся
+         * места: lv_obj_invalidate на активном экране помечает грязной всю
+         * площадь. Без этого полное обновление честно показало бы ту же
+         * испорченную картинку, что уже лежит в памяти панели.
+         */
+        display_blanking_on(panel_dev);
+
         render_batt_cb(NULL);
         render_bt_cb(NULL);
         render_layer_cb(NULL);
         render_mac_cb(NULL);
+
+        lv_obj_invalidate(lv_scr_act());
 
         housekeeping_phase_two = true;
         k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
@@ -783,13 +797,11 @@ static void housekeeping_cb(struct k_work *work) {
         return;
     }
 
-    /* Фаза 2: полное обновление панели. */
+    /* Фаза 2: полный прогон волной по всей панели — он и стирает остаточное. */
     housekeeping_phase_two = false;
+    display_blanking_off(panel_dev);
 
-    if (device_is_ready(panel_dev)) {
-        display_blanking_on(panel_dev);
-        display_blanking_off(panel_dev);
-    }
+    LOG_WRN("экран: полное обновление выполнено");
 
     k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
                                 K_MINUTES(CONFIG_SWEEP_DONGLE_FULL_REFRESH_MIN));
@@ -987,7 +999,7 @@ lv_obj_t *zmk_display_status_screen(void) {
      * поэтому экран не застывает, даже если за клавиатурой долго не сидели.
      */
     housekeeping_phase_two = false;
-    k_work_schedule_for_queue(zmk_display_work_q(), &housekeeping_work, K_SECONDS(20));
+    k_work_schedule_for_queue(zmk_display_work_q(), &housekeeping_work, K_SECONDS(10));
 
 #if IS_ENABLED(CONFIG_SWEEP_DONGLE_DEBUG_REFRESH)
     lv_disp_t *disp = lv_disp_get_default();

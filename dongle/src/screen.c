@@ -21,6 +21,8 @@
 
 #include <zmk/activity.h>
 #include <zmk/battery.h>
+#include <zephyr/drivers/display.h>
+
 #include <zmk/display.h>
 #include <zmk/display/status_screen.h>
 #include <zmk/event_manager.h>
@@ -67,6 +69,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define GRID_STATUS_Y 110
 #define GRID_RULE_BOTTOM 134
 #define GRID_HOST_Y 142
+
+/* Сколько ждать между перерисовкой полей и полным обновлением панели: кадр
+   выкладывается в панель из lv_task_handler, то есть в такте дисплея. */
+#define HOUSEKEEPING_SETTLE_MS 2500
 
 /*
  * Имена слоёв в порядке cradio.keymap. Держать синхронно с раскладкой.
@@ -477,7 +483,16 @@ static void schedule(struct k_work_delayable *work, const int64_t *last_ms, int3
 
     const int32_t delay = (since >= min_gap) ? coalesce : (int32_t)(min_gap - since);
 
-    k_work_schedule_for_queue(zmk_display_work_q(), work, K_MSEC(delay));
+    /*
+     * ПЕРЕвзводим, а не просто ставим в очередь.
+     *
+     * k_work_schedule по контракту Zephyr не делает НИЧЕГО, если работа уже
+     * стоит в очереди, исполняется или ждёт таймера. Метка же времени
+     * ставится в начале колбэка, а панель обновляется на сотни миллисекунд
+     * позже — всё, что пришло в этот промежуток, молча терялось и не
+     * доезжало до экрана до следующего события того же типа.
+     */
+    k_work_reschedule_for_queue(zmk_display_work_q(), work, K_MSEC(delay));
 }
 
 static void request_layer_render(void) {
@@ -564,10 +579,20 @@ static void ui_set_suspended(bool suspended) {
 }
 
 void dongle_ui_set_host(const struct dongle_host_state *st) {
-    /* Только копим. Отрисовка случится попутно, см. MAC_PIGGYBACK_DELAY_MS. */
     k_mutex_lock(&state_mutex, K_FOREVER);
     host_state = *st;
     k_mutex_unlock(&state_mutex);
+
+    /*
+     * И просим отрисовку сами.
+     *
+     * Раньше метрики только копились, а на панель попадали «попутно» — когда
+     * обновится заряд половинок или устоится слой. При ровной работе ни того,
+     * ни другого не случается часами, и экран выглядел застывшим. Частота
+     * ограничена MAC_MIN_GAP_MS, так что лишних обновлений панели это не
+     * добавляет.
+     */
+    request_mac_render();
 }
 
 /* --- состояние наружу ------------------------------------------------------ */
@@ -720,6 +745,55 @@ ZMK_SUBSCRIPTION(dongle_ui, zmk_position_state_changed);
 ZMK_SUBSCRIPTION(dongle_ui, zmk_ble_active_profile_changed);
 ZMK_SUBSCRIPTION(dongle_ui, zmk_endpoint_changed);
 ZMK_SUBSCRIPTION(dongle_ui, zmk_activity_state_changed);
+
+/*
+ * Полное обновление панели: лечит остаточное изображение.
+ *
+ * ssd16xx после первого кадра работает на частичном профиле (ssd16xx.c,
+ * SSD16XX_PROFILE_PARTIAL): перерисовывается только изменившийся прямоугольник,
+ * а остальное остаётся на стекле как было. Пиксели, которые больше никто не
+ * перерисовывает — например, вся прежняя разметка после смены прошивки —
+ * так и висят поверх новой картинки. Снимается это только полным обновлением.
+ *
+ * Zephyr даёт его через пару blanking_on/blanking_off: первый переводит
+ * драйвер на полный профиль, второй запускает обновление (ssd16xx.c:332-356).
+ *
+ * Работа двухфазная: сначала перерисовываем все поля, даём LVGL выложить их в
+ * панель, и только потом гоним полный цикл — иначе на стекле закрепилась бы
+ * предыдущая картинка.
+ */
+static const struct device *panel_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+
+static void housekeeping_cb(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(housekeeping_work, housekeeping_cb);
+
+static bool housekeeping_phase_two;
+
+static void housekeeping_cb(struct k_work *work) {
+    if (!housekeeping_phase_two) {
+        /* Фаза 1: обновить содержимое, не обращая внимания на ограничители. */
+        render_batt_cb(NULL);
+        render_bt_cb(NULL);
+        render_layer_cb(NULL);
+        render_mac_cb(NULL);
+
+        housekeeping_phase_two = true;
+        k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
+                                    K_MSEC(HOUSEKEEPING_SETTLE_MS));
+        return;
+    }
+
+    /* Фаза 2: полное обновление панели. */
+    housekeeping_phase_two = false;
+
+    if (device_is_ready(panel_dev)) {
+        display_blanking_on(panel_dev);
+        display_blanking_off(panel_dev);
+    }
+
+    k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
+                                K_MINUTES(CONFIG_SWEEP_DONGLE_FULL_REFRESH_MIN));
+}
 
 /* --- построение экрана ---------------------------------------------------- */
 
@@ -905,6 +979,15 @@ lv_obj_t *zmk_display_status_screen(void) {
                              LV_TEXT_ALIGN_LEFT, "CPU --   MEM --");
     lbl_disk_batt = make_field(screen, &lv_font_montserrat_16, GRID_X, GRID_HOST_Y + 22, GRID_W,
                                LV_TEXT_ALIGN_LEFT, "DISK --   BAT --");
+
+    /*
+     * Обслуживание панели: первый прогон вскоре после загрузки стирает
+     * остаточное изображение от прошлой прошивки, дальше — раз в
+     * SWEEP_DONGLE_FULL_REFRESH_MIN минут. Работает независимо от простоя,
+     * поэтому экран не застывает, даже если за клавиатурой долго не сидели.
+     */
+    housekeeping_phase_two = false;
+    k_work_schedule_for_queue(zmk_display_work_q(), &housekeeping_work, K_SECONDS(20));
 
 #if IS_ENABLED(CONFIG_SWEEP_DONGLE_DEBUG_REFRESH)
     lv_disp_t *disp = lv_disp_get_default();

@@ -84,8 +84,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
  * пишется отдельной подписью справа.
  */
 static const char *const layer_names[] = {
-    "BASE", "SYM",  "FN",   "SYM2", "FN2",  "GAME", "BASE", "BASE",
-    "SYM",  "SYM",  "SYM2", "SYM2", "FN",   "FN",   "FN2",  "FN2",
+    "BASE", "SYM", "SYM2", "FN",  "FN2",  "GAME", "BASE", "BASE",
+    "SYM",  "SYM", "SYM2", "SYM2", "FN",  "FN",   "FN2",  "FN2",
 };
 
 /* Силуэт устройства, залитый снизу пропорционально заряду. */

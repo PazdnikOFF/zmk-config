@@ -9,10 +9,19 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/outputs.h>
 
+/*
+ * Порядок слоёв важен: условный слой обязан быть НОМЕРОМ ВЫШЕ своих условий,
+ * иначе ZMK возьмёт биндинг с более верхнего слоя-условия (документация
+ * conditional-layers: «a then-layer should generally have a higher number
+ * than its associated if-layers»). Поэтому SYM_2 стоит после SYM и FNC.
+ *
+ * Номера обязаны совпадать с порядком узлов в keymap ниже, с layer_names[]
+ * в dongle/src/screen.c и с SWEEP_DONGLE_OS_LAYER_* в dongle/Kconfig.
+ */
 #define QWERTY  0
 #define SYM     1
-#define SYM_2   2
-#define FNC     3
+#define FNC     2
+#define SYM_2   3
 #define FNC_2   4
 #define GAME    5
 
@@ -111,13 +120,6 @@
          * удержанием: случайно попасть можно только уже находясь на слое, и
          * одиночное попадание ничего не делает.
          */
-        td_sym2: toggle_sym2_guarded {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <250>;
-            bindings = <&none>, <&tog SYM_2>;
-        };
-
         td_fnc2: toggle_fnc2_guarded {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
@@ -304,6 +306,22 @@
     conditional_layers {
         compatible = "zmk,conditional-layers";
 
+        /*
+         * SYM_2 — удержать ОБА внешних больших пальца (FNC и SYM).
+         *
+         * Это классический tri-layer, и выбран он ради безотказности: на нём
+         * лежат клавиши выбора BLE-профиля, то есть единственный способ
+         * вернуться на нужный компьютер. Ни таймингов, ни двойных тапов, ни
+         * комбо — слой есть ровно пока держишь два пальца, и залипнуть не
+         * может: документация ZMK прямо говорит, что состояние then-layer
+         * целиком определяется conditional_layers.
+         *
+         * Так сделано в реальных раскладках того же размера (nxtkb для Ferris
+         * Sweep, 0xcharly, urob) — везде дополнительный слой берут удержанием
+         * двух слоевых клавиш, а не комбо.
+         */
+        sym2_tri  { if-layers = <SYM FNC>;   then-layer = <SYM_2>;   };
+
         sym_win   { if-layers = <SYM WIN>;   then-layer = <SYM_W>;   };
         sym_lnx   { if-layers = <SYM LNX>;   then-layer = <SYM_L>;   };
         sym2_win  { if-layers = <SYM_2 WIN>; then-layer = <SYM_2_W>; };
@@ -347,25 +365,7 @@
 &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp N5  &kp NUMBER_6  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
 &kp HASH  &kp UNDER  &kp LPAR  &kp LBKT  &kp LBRC  &kp EQUAL  &kp QMARK  &kp SQT  &kp PLUS  &kp STAR
 &kp DLLR  &dc LS(NUMBER_6) AMPS  &kp RPAR  &kp RBKT  &kp RBRC  &kp AT  &kp EXCL  &kp DQT  &kp MINUS  &kp SLASH
-&kp LC(SPACE)  &kp LGUI  &td_sym2  &none
-            >;
-        };
-
-        /*
-
- | ` | \ | % |   |   |       |   |   |   |   |   |
- | ~ | | | ^ |   |   |       |   |   |   |   |   |
- |   |   |   |   |   |       |   |   |   |   |   |
-             |   |   |       |   |   |
-  * Режим ОС — парами: R+T это Мак, F+G это Windows, V+B это Linux.
-  */
-
-        sym_2_layer {
-            bindings = <
-&kp GRAVE  &kp BSLH  &kp PRCNT  &none  &none  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
-&kp TILDE  &kp PIPE  &kp CARET  &none  &none  &kp C_VOLUME_DOWN  &kp K_MUTE  &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
-&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none  &kp K_PREVIOUS  &kp K_PLAY_PAUSE  &kp K_NEXT  &out OUT_BLE  &studio_unlock
-VOICE_MAC  &none  &td_sym2  &none
+&kp LC(SPACE)  &kp LGUI  &trans  &none
             >;
         };
 
@@ -384,6 +384,23 @@ VOICE_MAC  &none  &td_sym2  &none
 &kp TAB  &kp LG(A)  &kp LG(S)  &kp LG(O)  &kp LG(F)  &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT  &kp BACKSPACE
 &kp CAPS  &kp LG(Z)  &kp LG(X)  &kp LG(C)  &kp LG(V)  &kp LG(SPACE)  &kp LEFT_COMMAND  &kp LEFT_CONTROL  &kp LEFT_SHIFT  &kp DEL
 &none  &td_fnc2  &kp BSPC  &kp ENTER
+            >;
+        };
+        /*
+
+ | ` | \ | % |   |   |       |   |   |   |   |   |
+ | ~ | | | ^ |   |   |       |   |   |   |   |   |
+ |   |   |   |   |   |       |   |   |   |   |   |
+             |   |   |       |   |   |
+  * Режим ОС — парами: R+T это Мак, F+G это Windows, V+B это Linux.
+  */
+
+        sym_2_layer {
+            bindings = <
+&kp GRAVE  &kp BSLH  &kp PRCNT  &none  &none  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+&kp TILDE  &kp PIPE  &kp CARET  &none  &none  &kp C_VOLUME_DOWN  &kp K_MUTE  &kp C_VOLUME_UP  &out OUT_USB  &bt BT_CLR_ALL
+&kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LG(N)  &none  &kp K_PREVIOUS  &kp K_PLAY_PAUSE  &kp K_NEXT  &out OUT_BLE  &studio_unlock
+VOICE_MAC  &none  &trans  &none
             >;
         };
 

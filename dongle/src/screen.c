@@ -21,8 +21,6 @@
 
 #include <zmk/activity.h>
 #include <zmk/battery.h>
-#include <zephyr/drivers/display.h>
-
 #include <zmk/display.h>
 #include <zmk/display/status_screen.h>
 #include <zmk/event_manager.h>
@@ -409,60 +407,35 @@ static void render_layer_cb(struct k_work *work) {
  * остальные поглощаются.
  */
 /*
- * Три блока экрана обновляются РАЗДЕЛЬНО, и это принципиально.
+ * Весь экран рисуется ОДНИМ проходом. Прежняя схема с раздельными блоками
+ * была построена на неверной посылке.
  *
- * Драйвер ssd16xx требует записи во всю ширину, поэтому Zephyr расширяет любую
- * грязную область до полной ширины экрана (lvgl_rounder_cb_mono,
- * SCREEN_INFO_X_ALIGNMENT_WIDTH) — обновляется горизонтальная полоса. Если
- * трогать батареи наверху и метрики внизу в одном проходе, LVGL склеит две
- * далёкие полосы в одну область почти во весь экран. Поэтому у каждого блока
- * своя работа и свой темп: полосы получаются узкие и независимые.
- */
-#define BLOCK_COALESCE_MS 500
-
-/* Заряд — раз в 5 секунд. */
-#define BATT_MIN_GAP_MS 5000
-
-/*
- * Ресурсы мака сами по себе поводом для обновления НЕ являются: приходящие
- * метрики только копятся в состоянии. На панель они попадают попутно — когда
- * экран и так обновляется из-за слоя или заряда.
+ * В комментарии стояло, будто ssd16xx требует записи во всю ширину, а Zephyr
+ * поэтому расширяет грязную область до полной ширины экрана. Это не так:
+ * драйвер объявляет SCREEN_INFO_MONO_VTILED | MONO_MSB_FIRST | EPD
+ * (ssd16xx.c), флага SCREEN_INFO_X_ALIGNMENT_WIDTH там нет, и прослойка LVGL
+ * округляет только Y до кратного восьми. То есть разносить блоки по времени
+ * было не нужно — зато каждая такая отрисовка превращалась в отдельное
+ * обновление панели по ~650 мс, и за цикл их выходило три-четыре.
  *
- * Попутная отрисовка сдвинута на полторы секунды намеренно. Нарисовать её в
- * том же цикле нельзя: блоки лежат в разных концах экрана, а ssd16xx пишет
- * только во всю ширину, поэтому LVGL склеил бы две далёкие полосы в одну
- * почти во весь экран. Полторы секунды заведомо больше одного обновления
- * (~650 мс), так что полосы получаются раздельными.
+ * Теперь наоборот: собираем все изменения и отдаём их одним кадром. Вместе с
+ * CONFIG_LV_Z_FULL_REFRESH=y это даёт ровно одну область на кадр и ровно одно
+ * обновление панели, в котором переписывается каждый пиксель — то есть слой
+ * «того, что никто не перерисовывает» не копится вовсе.
  */
-#define MAC_MIN_GAP_MS 15000
-#define MAC_PIGGYBACK_DELAY_MS 1500
-
-/* Выбор выхода — реакция на нажатие, тут нужна расторопность. */
-#define BT_MIN_GAP_MS 2000
-#define BT_COALESCE_MS 300
+#define RENDER_COALESCE_MS 500
+#define RENDER_MIN_GAP_MS 5000
 
 /*
- * Слой показывается, только если продержался 5 секунд. Здесь именно
- * k_work_reschedule, который СБРАСЫВАЕТ таймер: каждое переключение отодвигает
- * отрисовку, поэтому мелькание при переборе слоёв не доходит до панели, а
- * рисуется тот слой, на котором остановились.
+ * Слой показывается, только если продержался чуть дольше склейки: мелькание
+ * при переборе слоёв до панели не доходит, рисуется тот, на котором
+ * остановились.
  */
-#define LAYER_SETTLE_MS 5000
+#define LAYER_SETTLE_MS 2000
 
-K_WORK_DELAYABLE_DEFINE(layer_work, render_layer_cb);
-K_WORK_DELAYABLE_DEFINE(batt_work, render_batt_cb);
-K_WORK_DELAYABLE_DEFINE(mac_work, render_mac_cb);
-K_WORK_DELAYABLE_DEFINE(bt_work, render_bt_cb);
+static void render_all_cb(struct k_work *work);
 
-/*
- * Скорость печати: не чаще раза в минуту и через пару секунд после просьбы,
- * чтобы серия успела осесть. Чаще число попадает на панель попутно с
- * метриками мака — это та же полоса, лишнего обновления там нет.
- */
-#define SPEED_MIN_GAP_MS 60000
-#define SPEED_COALESCE_MS 2000
-
-K_WORK_DELAYABLE_DEFINE(speed_work, render_speed_cb);
+K_WORK_DELAYABLE_DEFINE(render_work, render_all_cb);
 
 /* Отметка передаётся указателем: читать её надо под тем же спинлоком, под
    которым её пишет mark_rendered() из очереди дисплея. */
@@ -495,6 +468,23 @@ static void schedule(struct k_work_delayable *work, const int64_t *last_ms, int3
     k_work_reschedule_for_queue(zmk_display_work_q(), work, K_MSEC(delay));
 }
 
+/* Один проход: всё, что изменилось, уходит в панель одним кадром. */
+static void render_all_cb(struct k_work *work) {
+    mark_rendered(&last_batt_render_ms);
+    mark_rendered(&last_mac_render_ms);
+    mark_rendered(&last_bt_render_ms);
+    mark_rendered(&last_speed_render_ms);
+
+    render_batt_cb(NULL);
+    render_bt_cb(NULL);
+    render_layer_cb(NULL);
+    render_mac_cb(NULL);
+}
+
+static void request_render(void) {
+    schedule(&render_work, &last_batt_render_ms, RENDER_MIN_GAP_MS, RENDER_COALESCE_MS);
+}
+
 static void request_layer_render(void) {
     if (!zmk_display_is_initialized()) {
         return;
@@ -505,25 +495,17 @@ static void request_layer_render(void) {
     k_spin_unlock(&ui_lock, key);
 
     if (!suspended) {
-        k_work_reschedule_for_queue(zmk_display_work_q(), &layer_work, K_MSEC(LAYER_SETTLE_MS));
+        k_work_reschedule_for_queue(zmk_display_work_q(), &render_work, K_MSEC(LAYER_SETTLE_MS));
     }
 }
 
-static void request_batt_render(void) {
-    schedule(&batt_work, &last_batt_render_ms, BATT_MIN_GAP_MS, BLOCK_COALESCE_MS);
-}
+static void request_batt_render(void) { request_render(); }
 
-static void request_mac_render(void) {
-    schedule(&mac_work, &last_mac_render_ms, MAC_MIN_GAP_MS, MAC_PIGGYBACK_DELAY_MS);
-}
+static void request_mac_render(void) { request_render(); }
 
-static void request_bt_render(void) {
-    schedule(&bt_work, &last_bt_render_ms, BT_MIN_GAP_MS, BT_COALESCE_MS);
-}
+static void request_bt_render(void) { request_render(); }
 
-void dongle_ui_request_speed_render(void) {
-    schedule(&speed_work, &last_speed_render_ms, SPEED_MIN_GAP_MS, SPEED_COALESCE_MS);
-}
+void dongle_ui_request_speed_render(void) { request_render(); }
 
 /*
  * Уход в простой и возврат из него.
@@ -557,11 +539,7 @@ static void ui_set_suspended(bool suspended) {
     k_spin_unlock(&ui_lock, key);
 
     if (suspended) {
-        k_work_cancel_delayable(&layer_work);
-        k_work_cancel_delayable(&batt_work);
-        k_work_cancel_delayable(&mac_work);
-        k_work_cancel_delayable(&bt_work);
-        k_work_cancel_delayable(&speed_work);
+        k_work_cancel_delayable(&render_work);
         return;
     }
 
@@ -569,13 +547,7 @@ static void ui_set_suspended(bool suspended) {
         return;
     }
 
-    /* Разносим по времени: одновременная отрисовка блоков из разных концов
-       экрана склеилась бы в одну полосу почти во весь экран. */
-    struct k_work_q *q = zmk_display_work_q();
-    k_work_schedule_for_queue(q, &bt_work, K_MSEC(WAKE_RENDER_DELAY_MS));
-    k_work_schedule_for_queue(q, &layer_work, K_MSEC(WAKE_RENDER_DELAY_MS + 1500));
-    k_work_schedule_for_queue(q, &batt_work, K_MSEC(WAKE_RENDER_DELAY_MS + 3000));
-    k_work_schedule_for_queue(q, &mac_work, K_MSEC(WAKE_RENDER_DELAY_MS + 4500));
+    k_work_reschedule_for_queue(zmk_display_work_q(), &render_work, K_MSEC(WAKE_RENDER_DELAY_MS));
 }
 
 void dongle_ui_set_host(const struct dongle_host_state *st) {
@@ -747,64 +719,57 @@ ZMK_SUBSCRIPTION(dongle_ui, zmk_endpoint_changed);
 ZMK_SUBSCRIPTION(dongle_ui, zmk_activity_state_changed);
 
 /*
- * Полное обновление панели: лечит остаточное изображение.
+ * Чистка панели: прогон ЧЕРЕЗ ЧЁРНОЕ И БЕЛОЕ, без blanking.
  *
- * ssd16xx после первого кадра работает на частичном профиле (ssd16xx.c,
- * SSD16XX_PROFILE_PARTIAL): перерисовывается только изменившийся прямоугольник,
- * а остальное остаётся на стекле как было. Пиксели, которые больше никто не
- * перерисовывает — например, вся прежняя разметка после смены прошивки —
- * так и висят поверх новой картинки. Снимается это только полным обновлением.
+ * Прошлая попытка звала пару display_blanking_on/off — и, похоже, сама же
+ * делала кашу. В Zephyr 3.5 драйвер ssd16xx при наличии профиля partial
+ * держит в красном плане ПРЕДЫДУЩИЙ кадр, а регистр Display Update Control 1
+ * (0x21) не программирует. Полное обновление в таком состоянии накладывает
+ * старый кадр на новый: в zephyr#117609 это описано дословно — «RED == BLACK
+ * superimposes every frame and RED == ~BLACK blanks the panel». Патч туда не
+ * влит ни в 3.5, ни в main.
  *
- * Zephyr даёт его через пару blanking_on/blanking_off: первый переводит
- * драйвер на полный профиль, второй запускает обновление (ssd16xx.c:332-356).
+ * Поэтому чистим так, как это делают проекты, живущие на e-paper: гоним по
+ * панели обычными частичными кадрами чёрный, затем белый, затем содержимое.
+ * Проход через белое обязателен — именно он снимает остаточное изображение.
+ * Никакого blanking, никакого красного плана.
  *
- * Работа двухфазная: сначала перерисовываем все поля, даём LVGL выложить их в
- * панель, и только потом гоним полный цикл — иначе на стекле закрепилась бы
- * предыдущая картинка.
+ * Вместе с CONFIG_LV_Z_FULL_REFRESH=y каждый такой кадр переписывает всю
+ * площадь, поэтому чистка получается честной.
  */
-static const struct device *panel_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+static lv_obj_t *cover;
+static uint8_t cleanup_phase;
 
-static void housekeeping_cb(struct k_work *work);
-static K_WORK_DELAYABLE_DEFINE(housekeeping_work, housekeeping_cb);
+static void cleanup_cb(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(cleanup_work, cleanup_cb);
 
-static bool housekeeping_phase_two;
-
-static void housekeeping_cb(struct k_work *work) {
-    if (!device_is_ready(panel_dev)) {
+static void cleanup_cb(struct k_work *work) {
+    if (cover == NULL) {
         return;
     }
 
-    if (!housekeeping_phase_two) {
-        /*
-         * Фаза 1. Переводим драйвер на полный профиль (blanking_on) и
-         * заставляем LVGL перерисовать ВЕСЬ экран, а не только изменившиеся
-         * места: lv_obj_invalidate на активном экране помечает грязной всю
-         * площадь. Без этого полное обновление честно показало бы ту же
-         * испорченную картинку, что уже лежит в памяти панели.
-         */
-        display_blanking_on(panel_dev);
-
-        render_batt_cb(NULL);
-        render_bt_cb(NULL);
-        render_layer_cb(NULL);
-        render_mac_cb(NULL);
-
-        lv_obj_invalidate(lv_scr_act());
-
-        housekeeping_phase_two = true;
-        k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
-                                    K_MSEC(HOUSEKEEPING_SETTLE_MS));
+    switch (cleanup_phase) {
+    case 0: /* вся панель чёрная */
+        lv_obj_set_style_bg_color(cover, lv_color_black(), LV_PART_MAIN);
+        lv_obj_clear_flag(cover, LV_OBJ_FLAG_HIDDEN);
+        cleanup_phase = 1;
+        break;
+    case 1: /* вся панель белая — этот шаг и стирает остаточное */
+        lv_obj_set_style_bg_color(cover, lv_color_white(), LV_PART_MAIN);
+        cleanup_phase = 2;
+        break;
+    default: /* содержимое */
+        lv_obj_add_flag(cover, LV_OBJ_FLAG_HIDDEN);
+        render_all_cb(NULL);
+        cleanup_phase = 0;
+        LOG_INF("экран: чистка выполнена");
+        k_work_reschedule_for_queue(zmk_display_work_q(), &cleanup_work,
+                                    K_MINUTES(CONFIG_SWEEP_DONGLE_FULL_REFRESH_MIN));
         return;
     }
 
-    /* Фаза 2: полный прогон волной по всей панели — он и стирает остаточное. */
-    housekeeping_phase_two = false;
-    display_blanking_off(panel_dev);
-
-    LOG_WRN("экран: полное обновление выполнено");
-
-    k_work_reschedule_for_queue(zmk_display_work_q(), &housekeeping_work,
-                                K_MINUTES(CONFIG_SWEEP_DONGLE_FULL_REFRESH_MIN));
+    k_work_reschedule_for_queue(zmk_display_work_q(), &cleanup_work,
+                                K_MSEC(HOUSEKEEPING_SETTLE_MS));
 }
 
 /* --- построение экрана ---------------------------------------------------- */
@@ -998,8 +963,13 @@ lv_obj_t *zmk_display_status_screen(void) {
      * SWEEP_DONGLE_FULL_REFRESH_MIN минут. Работает независимо от простоя,
      * поэтому экран не застывает, даже если за клавиатурой долго не сидели.
      */
-    housekeeping_phase_two = false;
-    k_work_schedule_for_queue(zmk_display_work_q(), &housekeeping_work, K_SECONDS(10));
+    /* Перекрытие во весь экран для чистки: обычный объект, скрыт в покое. */
+    cover = make_box(screen, 0, 0, 200, 200, false);
+    lv_obj_set_style_radius(cover, 0, LV_PART_MAIN);
+    lv_obj_add_flag(cover, LV_OBJ_FLAG_HIDDEN);
+
+    cleanup_phase = 0;
+    k_work_schedule_for_queue(zmk_display_work_q(), &cleanup_work, K_SECONDS(10));
 
 #if IS_ENABLED(CONFIG_SWEEP_DONGLE_DEBUG_REFRESH)
     lv_disp_t *disp = lv_disp_get_default();

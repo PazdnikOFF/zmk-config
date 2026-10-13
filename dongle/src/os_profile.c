@@ -69,6 +69,27 @@ static void apply_profile(uint8_t profile) {
     const uint8_t want =
         profile < ARRAY_SIZE(profile_layer) ? profile_layer[profile] : OS_LAYER_NONE;
 
+    /*
+     * Смена машины начинается с чистого листа.
+     *
+     * Слои в ZMK живут независимо от профиля: включённый тоглом SYM_2 или
+     * FNC_2 остаётся включённым и после переключения на другой хост, то есть
+     * на новой машине раскладка оказывается не та, которую ждёшь. Гасим всё,
+     * кроме базового слоя, и только потом поднимаем флаг режима ОС.
+     *
+     * Базовый слой не трогаем: zmk_keymap_layer_active_with_state считает его
+     * активным всегда (keymap.c), и гасить его бессмысленно.
+     */
+    const zmk_keymap_layer_id_t base = zmk_keymap_layer_default();
+
+    for (zmk_keymap_layer_index_t i = 0; i < ZMK_KEYMAP_LAYERS_LEN; i++) {
+        const zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(i);
+
+        if (id != ZMK_KEYMAP_LAYER_ID_INVAL && id != base) {
+            zmk_keymap_layer_deactivate(id);
+        }
+    }
+
     /* Гасим чужой флаг раньше, чем поднимаем свой: два разом активных флага
        подняли бы обе накладки, и выиграла бы та, что выше номером. */
     if (want != CONFIG_SWEEP_DONGLE_OS_LAYER_WIN) {

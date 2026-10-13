@@ -56,6 +56,19 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define PCT_Y 46
 
 /*
+ * Сетка нижней части экрана. Все значения в пикселях панели 200x200.
+ * Поля по краям 12 пикселей, полосы разделены линиями; высоты подобраны так,
+ * чтобы 28-й кегль и 16-й не наезжали друг на друга.
+ */
+#define GRID_X 12
+#define GRID_W (200 - 2 * GRID_X)
+#define GRID_RULE_TOP 68
+#define GRID_MAIN_Y 74
+#define GRID_STATUS_Y 110
+#define GRID_RULE_BOTTOM 134
+#define GRID_HOST_Y 142
+
+/*
  * Имена слоёв в порядке cradio.keymap. Держать синхронно с раскладкой.
  *
  * Слоёв больше, чем показываемых имён: под Windows и Linux у каждого рабочего
@@ -270,10 +283,10 @@ static void render_mac_cb(struct k_work *work) {
     set_text_if_changed(lbl_cpu_mem, buf);
 
     if (host.valid) {
-        snprintf(buf, sizeof(buf), "%uG free   BAT %u%%%s", host.disk_free_gb, host.batt_pct,
+        snprintf(buf, sizeof(buf), "DISK %uG   BAT %u%%%s", host.disk_free_gb, host.batt_pct,
                  host.charging ? "+" : "");
     } else {
-        snprintf(buf, sizeof(buf), "--G free   BAT --");
+        snprintf(buf, sizeof(buf), "DISK --   BAT --");
     }
     set_text_if_changed(lbl_disk_batt, buf);
 
@@ -721,6 +734,29 @@ static lv_obj_t *make_label(lv_obj_t *parent, const lv_font_t *font, int16_t x, 
     return label;
 }
 
+/*
+ * Поле с ФИКСИРОВАННОЙ рамкой.
+ *
+ * Обычный lv_label растёт по содержимому: строка «CPU 7%» уже, чем
+ * «CPU 23%», и соседние подписи разъезжаются от кадра к кадру. На e-paper это
+ * вдвойне плохо — перерисовывается вся полоса, а не изменившееся число.
+ * Поэтому каждому полю задаём ширину, выравнивание и обрезку: блок стоит на
+ * месте, меняется только текст внутри него.
+ */
+static lv_obj_t *make_field(lv_obj_t *parent, const lv_font_t *font, int16_t x, int16_t y,
+                            int16_t w, lv_text_align_t align, const char *text) {
+    lv_obj_t *label = lv_label_create(parent);
+
+    lv_obj_set_style_text_font(label, font, LV_PART_MAIN);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_CLIP);
+    lv_obj_set_width(label, w);
+    lv_obj_set_style_text_align(label, align, LV_PART_MAIN);
+    lv_label_set_text(label, text);
+    lv_obj_set_pos(label, x, y);
+
+    return label;
+}
+
 /* Пустой прямоугольник без темы: контур либо сплошная заливка. */
 static lv_obj_t *make_box(lv_obj_t *parent, int16_t x, int16_t y, int16_t w, int16_t h,
                           bool outline) {
@@ -830,36 +866,45 @@ lv_obj_t *zmk_display_status_screen(void) {
     build_dongle_icon(screen, &icon_dongle, DONGLE_X);
     build_half_icon(screen, &icon_left, RIGHT_X, true);
 
-    make_rule(screen, 70);
+    make_rule(screen, GRID_RULE_TOP);
 
-    /* Живёт в одной полосе со слоем — там слева пусто, а обновление полосы
-       всё равно общее, так что отдельной строки это не стоит. */
-    lbl_bt = make_label(screen, &lv_font_montserrat_16, 8, 86, "BT1");
+    /*
+     * Сетка.
+     *
+     * Экран 200x200 поделён на четыре полосы с полями по 12 пикселей с каждой
+     * стороны: батареи, главная строка, строка состояния, метрики мака. Поля
+     * ниже — с фиксированной шириной, поэтому ни одно число не сдвигает
+     * соседа, когда меняет длину.
+     *
+     * Иерархия как в рекомендациях Apple: один уровень — главный (слой и язык
+     * крупно, их читают мельком), второй — поясняющий (профиль, режим ОС,
+     * скорость), третий — фоновые метрики мака мелким кеглем. Разделители
+     * только между смысловыми группами, украшений нет.
+     */
 
+    /* Главная строка: слева слой клавиатуры, справа язык ввода. */
+    lbl_layer = make_field(screen, &lv_font_montserrat_28, GRID_X, GRID_MAIN_Y, 108,
+                           LV_TEXT_ALIGN_LEFT, "BASE");
+    lbl_layout = make_field(screen, &lv_font_montserrat_28, GRID_X + 108, GRID_MAIN_Y,
+                            GRID_W - 108, LV_TEXT_ALIGN_RIGHT, "--");
+
+    /* Строка состояния: выход, режим ОС, скорость печати. */
+    lbl_bt = make_field(screen, &lv_font_montserrat_16, GRID_X, GRID_STATUS_Y, 62,
+                        LV_TEXT_ALIGN_LEFT, "BT1");
 #if IS_ENABLED(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE)
-    /* Режим ОС — справа в той же полосе, симметрично профилю слева. */
-    lbl_os = make_label(screen, &lv_font_montserrat_16, 140, 86, "MAC");
-    lv_obj_set_width(lbl_os, 52);
-    lv_obj_set_style_text_align(lbl_os, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+    lbl_os = make_field(screen, &lv_font_montserrat_16, GRID_X + 62, GRID_STATUS_Y, 52,
+                        LV_TEXT_ALIGN_CENTER, "MAC");
 #endif
+    lbl_speed = make_field(screen, &lv_font_montserrat_16, GRID_X + 114, GRID_STATUS_Y,
+                           GRID_W - 114, LV_TEXT_ALIGN_RIGHT, "");
 
-    lbl_layer = make_label(screen, &lv_font_montserrat_28, 0, 76, "BASE");
-    lv_obj_set_width(lbl_layer, 200);
-    lv_obj_set_style_text_align(lbl_layer, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    make_rule(screen, GRID_RULE_BOTTOM);
 
-    make_rule(screen, 114);
-
-    make_label(screen, &lv_font_montserrat_16, 8, 128, "MAC");
-    lbl_layout = make_label(screen, &lv_font_montserrat_28, 100, 120, "--");
-    lv_obj_set_width(lbl_layout, 92);
-    lv_obj_set_style_text_align(lbl_layout, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
-
-    /* Скорость печати: между подписью MAC и раскладкой. Пустая, пока не
-       набралось ни одной серии. */
-    lbl_speed = make_label(screen, &lv_font_montserrat_16, 58, 128, "");
-
-    lbl_cpu_mem = make_label(screen, &lv_font_montserrat_16, 8, 158, "CPU --   MEM --");
-    lbl_disk_batt = make_label(screen, &lv_font_montserrat_16, 8, 178, "--G free   BAT --");
+    /* Метрики мака: подпись слева, значения справа, по одной строке на пару. */
+    lbl_cpu_mem = make_field(screen, &lv_font_montserrat_16, GRID_X, GRID_HOST_Y, GRID_W,
+                             LV_TEXT_ALIGN_LEFT, "CPU --   MEM --");
+    lbl_disk_batt = make_field(screen, &lv_font_montserrat_16, GRID_X, GRID_HOST_Y + 22, GRID_W,
+                               LV_TEXT_ALIGN_LEFT, "DISK --   BAT --");
 
 #if IS_ENABLED(CONFIG_SWEEP_DONGLE_DEBUG_REFRESH)
     lv_disp_t *disp = lv_disp_get_default();

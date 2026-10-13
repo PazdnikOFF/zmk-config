@@ -19,7 +19,11 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include <zephyr/init.h>
+
 #include <zmk/ble.h>
+#include <zmk/event_manager.h>
+#include <zmk/events/ble_active_profile_changed.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -69,6 +73,49 @@ static void on_security_changed(struct bt_conn *conn, bt_security_t level,
         describe("зашифрован", conn, level);
     }
 }
+
+/*
+ * Что донгл помнит о компьютерах.
+ *
+ * Самый частый вопрос при «не подключается»: лежит ли адрес хоста в профиле
+ * вообще. ZMK печатает это только на уровне DBG при загрузке настроек
+ * («Loaded ... address for profile N»), а DBG на пути нажатия стоит дорого.
+ * Печатаем то же самое уровнем WRN, один раз после старта и при каждой смене
+ * профиля.
+ */
+static void dump_profiles(struct k_work *work) {
+    for (uint8_t i = 0; i < ZMK_BLE_PROFILE_COUNT; i++) {
+        char addr[BT_ADDR_LE_STR_LEN];
+        bt_addr_le_to_str(zmk_ble_profile_address(i), addr, sizeof(addr));
+
+        LOG_WRN("профиль %d: %s%s%s%s", i + 1, zmk_ble_profile_is_open(i) ? "свободен" : addr,
+                zmk_ble_profile_is_connected(i) ? ", подключён" : "",
+                i == zmk_ble_active_profile_index() ? ", АКТИВНЫЙ" : "",
+                zmk_ble_active_profile_is_open() && i == zmk_ble_active_profile_index()
+                    ? " (ждёт сопряжения)"
+                    : "");
+    }
+}
+
+static K_WORK_DELAYABLE_DEFINE(dump_work, dump_profiles);
+
+static int profiles_listener(const zmk_event_t *eh) {
+    if (as_zmk_ble_active_profile_changed(eh) != NULL) {
+        k_work_reschedule(&dump_work, K_MSEC(500));
+    }
+
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(sweep_profiles_log, profiles_listener);
+ZMK_SUBSCRIPTION(sweep_profiles_log, zmk_ble_active_profile_changed);
+
+static int dump_init(void) {
+    k_work_schedule(&dump_work, K_SECONDS(3));
+    return 0;
+}
+
+SYS_INIT(dump_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 
 BT_CONN_CB_DEFINE(sweep_host_log) = {
     .connected = on_connected,

@@ -141,7 +141,9 @@ static struct dongle_kbd_state kbd_state;
  */
 static int dongle_ui_state_init(void) {
     kbd_state.self_batt = UNKNOWN_BATT;
-    kbd_state.left_slot = -1;
+
+    /* -1 — определять сторону по первому нажатию, иначе номер задан жёстко. */
+    kbd_state.left_slot = CONFIG_SWEEP_DONGLE_LEFT_SLOT;
 
     for (size_t i = 0; i < ARRAY_SIZE(kbd_state.slot_batt); i++) {
         kbd_state.slot_batt[i] = UNKNOWN_BATT;
@@ -693,7 +695,7 @@ static int dongle_ui_event_listener(const zmk_event_t *eh) {
             const int8_t slot =
                 position_is_left(pos->position) ? pos->source : (pos->source == 0 ? 1 : 0);
 
-            if (kbd_state.left_slot != slot) {
+            if (CONFIG_SWEEP_DONGLE_LEFT_SLOT < 0 && kbd_state.left_slot != slot) {
                 kbd_state.left_slot = slot;
                 dirty = true;
             }

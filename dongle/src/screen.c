@@ -908,14 +908,16 @@ lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_set_style_pad_all(screen, 0, LV_PART_MAIN);
 
     /*
-     * Ряд батарей. Блок левой половины стоит СПРАВА, правой — слева: так они
-     * расположены относительно того, как на донгл смотрят. Буква внутри
-     * силуэта говорит, какая это половина, поэтому перестановка ничего не
-     * запутывает.
+     * Ряд батарей: левая половина слева, правая справа, как они лежат на столе
+     * перед владельцем.
+     *
+     * Раньше блоки стояли зеркально — из соображения «так они расположены
+     * относительно того, как на донгл смотрят». На практике это читалось как
+     * перепутанные половинки, и буква внутри силуэта вопрос не снимала.
      */
-    build_half_icon(screen, &icon_right, LEFT_X, false);
+    build_half_icon(screen, &icon_left, LEFT_X, true);
     build_dongle_icon(screen, &icon_dongle, DONGLE_X);
-    build_half_icon(screen, &icon_left, RIGHT_X, true);
+    build_half_icon(screen, &icon_right, RIGHT_X, false);
 
     make_rule(screen, GRID_RULE_TOP);
 

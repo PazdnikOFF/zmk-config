@@ -1,0 +1,138 @@
+/*
+ * Copyright (c) 2020 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+
+#define QWERTY 0
+#define SYM    1
+#define SYM_2  2
+#define FNC    3
+#define FNC_2  4
+
+/*
+ * Corne (crkbd) 6-column layout — physical key positions
+ *
+ *   0   1   2   3   4   5        6   7   8   9  10  11
+ *  12  13  14  15  16  17       18  19  20  21  22  23
+ *  24  25  26  27  28  29       30  31  32  33  34  35
+ *              36  37  38       39  40  41
+ *
+ * The inner 3x5 + inner 2 thumbs come straight from the Ferris Sweep keymap.
+ * The extra outer columns (0/12/24 and 11/23/35) and outer thumbs (36/41)
+ * are the new keys added to turn this into a full typing keyboard.
+ */
+
+&mt {
+  //  flavor = "tap-preferred";
+   // tapping_term_ms = <200>;
+};
+
+/ {
+
+    combos {
+        compatible = "zmk,combos";
+
+        // right inner thumbs -> toggle SYM_2  (was sweep positions 32 33)
+        combo_sym2 {
+            timeout-ms = <50>;
+            key-positions = <39 40>;
+            bindings = <&tog SYM_2>;
+        };
+
+        // left inner thumbs -> toggle FNC_2  (was sweep positions 30 31)
+        combo_fun2 {
+            timeout-ms = <50>;
+            key-positions = <37 38>;
+            bindings = <&tog FNC_2>;
+        };
+
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+/*
+ | TAB | Q | W | E | R | T |     | Y | U | I | O | P | BSPC |
+ | CTL | A | S | D | F | G |     | H | J | K | L | ;:| '"   |
+ | SFT | Z | X | C | V | B |     | N | M | ,<| .>| /?| ESC  |
+             | CMD | FUN | SFT | | SPACE | SYM | ENTER |
+  */
+
+        default_layer {
+            bindings = <
+        &kp TAB    &kp Q   &kp W   &kp E   &kp R   &kp T           &kp Y   &kp U   &kp I    &kp O   &kp P     &kp BSPC
+        &kp LCTRL  &kp A   &kp S   &kp D   &kp F   &kp G           &kp H   &kp J   &kp K    &kp L   &kp SEMI  &kp SQT
+        &kp LSHFT  &kp Z   &kp X   &kp C   &kp V   &kp B           &kp N   &kp M   &kp CMMA &kp DOT &kp SLASH &kp ESC
+                                &kp LGUI  &mo FNC  &kp LSFT    &kp SPC  &mo SYM  &kp RET
+            >;
+        };
+
+/*
+ | TAB | 1 | 2 | 3 | 4 | 5 |     | 6 | 7 | 8 | 9 | 0 | BSPC |
+ | CTL | # | _ | ( | [ | { |     | = | ? | ' | + | * | DEL  |
+ | SFT | $ | & | ) | ] | } |     | @ | ! | " | - | / | ESC  |
+             |     | CMD |     | |     |     |     |
+  */
+
+        sym_layer {
+            bindings = <
+        &kp TAB    &kp NUM_1  &kp NUM_2  &kp NUM_3  &kp NUM_4  &kp NUM_5       &kp NUM_6  &kp NUM_7  &kp NUM_8  &kp NUM_9  &kp NUM_0  &kp BSPC
+        &kp LCTRL  &kp HASH   &kp UNDER  &kp LPAR   &kp LBKT   &kp LBRC        &kp EQUAL  &kp QMARK  &kp SQT    &kp PLUS   &kp STAR   &kp DEL
+        &kp LSHFT  &kp DLLR   &kp AMPS   &kp RPAR   &kp RBKT   &kp RBRC        &kp AT     &kp EXCL   &kp DQT    &kp MINUS  &kp SLASH  &kp ESC
+                                            &trans  &none      &kp LGUI    &none    &none    &trans
+            >;
+        };
+
+/*
+ | ` | \ | % |   |   |     | BT0 | BT1 | BT2 | BT3 | BT4 |
+ | ~ | | | ^ |   |   |     |     |     |     |     | BTCLR |
+ |   |   |   |   |   |     |     |     |     |     |       |
+  */
+
+        sym_2_layer {
+            bindings = <
+        &trans  &kp GRAVE  &kp BSLH  &kp PRCNT  &none  &none       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &trans
+        &trans  &kp TILDE  &kp PIPE  &kp CARET  &none  &none       &none         &none         &none         &none         &bt BT_CLR    &trans
+        &trans  &none      &none     &none      &none  &none       &none         &none         &none         &none         &none         &trans
+                                        &trans  &none  &none       &none  &none  &trans
+            >;
+        };
+
+/*
+ | ESC |     | ⌘3 | ⌘4 | ⌘5 |     | C← | C↓ | C↑ | C→ |   |
+ | TAB | ⌘S  |    |    |    |     | ←  | ↓  | ↑  | →  |   |
+ | CAP | ⌘X  | ⌘C | ⌘V | ⌘Z |     | ⌘␣ |    |    |    |   |
+             |     |     |     | | BSPC | ENTER |     |
+  */
+
+        fnc_layer {
+            bindings = <
+        &trans  &kp ESC   &none       &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp LG(LS(NUMBER_5))     &kp LC(LEFT)   &kp LC(DOWN)  &kp LC(UP)  &kp LC(RIGHT)  &none  &trans
+        &trans  &kp TAB   &kp LG(S)   &none                 &none                 &none                    &kp LEFT       &kp DOWN      &kp UP      &kp RIGHT      &none  &trans
+        &trans  &kp CAPS  &kp LG(X)   &kp LG(C)             &kp LG(V)             &kp LG(Z)                &kp LG(SPACE)  &none         &none       &none          &none  &trans
+                                                    &trans  &none  &none      &kp BSPC  &kp ENTER  &trans
+            >;
+        };
+
+/*
+ | F1  | F2  | F3 | F4 | F5 |     | F6  | F7  | F8  | F9  | F10 |
+ | ⌥⇧A | ⌥⇧S |⌥⇧D |⌥⇧F |⌥⇧I |     | ⌥⇧H | ⌥⇧J | ⌥⇧K | ⌥⇧L |     |
+ | F11 | F22 |    |    |    |     |⌥⇧⌃H |⌥⇧⌃J |⌥⇧⌃K |⌥⇧⌃L |     |
+  */
+
+        fnc_2_layer {
+            bindings = <
+        &trans  &kp F1         &kp F2         &kp F3         &kp F4         &kp F5          &kp F6             &kp F7             &kp F8             &kp F9             &kp F10  &trans
+        &trans  &kp LA(LS(A))  &kp LA(LS(S))  &kp LA(LS(D))  &kp LA(LS(F))  &kp LA(LS(I))   &kp LA(LS(H))      &kp LA(LS(J))      &kp LA(LS(K))      &kp LA(LS(L))      &none    &trans
+        &trans  &kp F11        &kp F22        &none          &none          &none           &kp LA(LS(LC(H)))  &kp LA(LS(LC(J)))  &kp LA(LS(LC(K)))  &kp LA(LS(LC(L)))  &none    &trans
+                                                    &trans  &none  &none      &none  &none  &trans
+            >;
+        };
+
+    };
+};

@@ -65,7 +65,7 @@ include:
   - board: nice_nano//zmk
     shield: sweep_dongle
     snippet: zmk-usb-logging
-    cmake-args: -DCONFIG_ZMK_LOGGING_MINIMAL=y -DCONFIG_ZMK_LOG_LEVEL_INF=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_SWEEP_DONGLE_DEBUG_HOSTS=y
+    cmake-args: -DCONFIG_ZMK_LOGGING_MINIMAL=y -DCONFIG_ZMK_LOG_LEVEL_INF=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_SWEEP_DONGLE_DEBUG_HOSTS=y -DCONFIG_THREAD_ANALYZER=y -DCONFIG_THREAD_ANALYZER_AUTO=y -DCONFIG_THREAD_ANALYZER_AUTO_INTERVAL=60 -DCONFIG_THREAD_NAME=y
     artifact-name: sweep_dongle_quiet
 
   # Диагностика ЛЕВОЙ половинки. Раньше её не было вовсе, хотя жалобы на

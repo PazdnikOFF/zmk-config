@@ -19,6 +19,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/init.h>
 
 #include <zmk/ble.h>
@@ -83,7 +84,20 @@ static void on_security_changed(struct bt_conn *conn, bt_security_t level,
  * Печатаем то же самое уровнем WRN, один раз после старта и при каждой смене
  * профиля.
  */
+static void count_bond(const struct bt_bond_info *info, void *user_data) {
+    char addr[BT_ADDR_LE_STR_LEN];
+    bt_addr_le_to_str(&info->addr, addr, sizeof(addr));
+
+    LOG_WRN("бонд: %s, профиль %d", addr, zmk_ble_profile_index(&info->addr));
+    (*(int *)user_data)++;
+}
+
 static void dump_profiles(struct k_work *work) {
+    int bonds = 0;
+
+    bt_foreach_bond(BT_ID_DEFAULT, count_bond, &bonds);
+    LOG_WRN("бондов: %d из %d", bonds, CONFIG_BT_MAX_PAIRED);
+
     for (uint8_t i = 0; i < ZMK_BLE_PROFILE_COUNT; i++) {
         char addr[BT_ADDR_LE_STR_LEN];
         bt_addr_le_to_str(zmk_ble_profile_address(i), addr, sizeof(addr));

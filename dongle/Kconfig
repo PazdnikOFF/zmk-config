@@ -76,16 +76,6 @@ config SWEEP_DONGLE_SINGLE_HOST_DELAY_MS
       подключиться. Пауза даёт связи установиться, чтобы не выгнать того,
       кто как раз становится активным.
 
-config SWEEP_DONGLE_HOST_PROFILE_ADOPT
-    bool "Записывать хост с ключами, но без профиля, в открытый профиль"
-    depends on ZMK_BLE && ZMK_SPLIT_ROLE_CENTRAL
-    default y if SHIELD_SWEEP_DONGLE
-    help
-      Хост, у которого есть бонд, но адрес не записан ни в один профиль,
-      шифрует связь без сопряжения. ZMK пишет адрес в профиль только по итогам
-      сопряжения, поэтому такой хост показывает «подключено», а нажатий не
-      получает. &bt BT_CLR_ALL его ключи не снимает.
-
 config SWEEP_DONGLE_OS_BY_PROFILE
     bool "Режим ОС хоста по BLE-профилю"
     depends on ZMK_BLE && ZMK_SPLIT_ROLE_CENTRAL

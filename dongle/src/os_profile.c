@@ -59,9 +59,9 @@ static void set_layer(uint8_t index, bool on) {
     }
 
     if (on) {
-        zmk_keymap_layer_activate(id);
+        zmk_keymap_layer_activate(id, true);
     } else {
-        zmk_keymap_layer_deactivate(id);
+        zmk_keymap_layer_deactivate(id, true);
     }
 }
 
@@ -86,7 +86,7 @@ static void apply_profile(uint8_t profile) {
         const zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(i);
 
         if (id != ZMK_KEYMAP_LAYER_ID_INVAL && id != base) {
-            zmk_keymap_layer_deactivate(id);
+            zmk_keymap_layer_deactivate(id, true);
         }
     }
 

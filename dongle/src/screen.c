@@ -316,15 +316,18 @@ static void render_speed_cb(struct k_work *work) {
 static void render_bt_cb(struct k_work *work) {
     mark_rendered(&last_bt_render_ms);
 
-    const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
+    const struct zmk_endpoint_instance endpoint = zmk_endpoint_get_selected();
     char buf[16];
 
     switch (endpoint.transport) {
     case ZMK_TRANSPORT_USB:
         snprintf(buf, sizeof(buf), "USB");
         break;
+    /* NONE: хост не подключён. Профиль всё равно показываем, иначе при обрыве
+       на экране пропадал бы номер. */
+    case ZMK_TRANSPORT_NONE:
     case ZMK_TRANSPORT_BLE: {
-        const int profile = endpoint.ble.profile_index + 1;
+        const int profile = zmk_ble_active_profile_index() + 1;
 
         if (zmk_ble_active_profile_is_open()) {
             snprintf(buf, sizeof(buf), "BT%d ?", profile);
@@ -591,7 +594,7 @@ void dongle_ui_fill_state(struct dongle_public_state *out) {
     out->batt_dongle = (kbd.self_batt < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)kbd.self_batt;
     out->left_slot = (kbd.left_slot < 0) ? 0xFF : (uint8_t)kbd.left_slot;
 
-    const struct zmk_endpoint_instance endpoint = zmk_endpoints_selected();
+    const struct zmk_endpoint_instance endpoint = zmk_endpoint_get_selected();
 
     if (endpoint.transport == ZMK_TRANSPORT_USB) {
         out->bt_profile = 0;
@@ -599,7 +602,7 @@ void dongle_ui_fill_state(struct dongle_public_state *out) {
         return;
     }
 
-    out->bt_profile = endpoint.ble.profile_index + 1;
+    out->bt_profile = zmk_ble_active_profile_index() + 1;
     out->bt_flags = 0;
     if (zmk_ble_active_profile_is_open()) {
         out->bt_flags |= DONGLE_BT_OPEN;

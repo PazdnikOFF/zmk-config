@@ -24,16 +24,16 @@ include:
   # центральной. Периферии Studio бесполезен: он правит раскладку, а раскладка
   # живёт на донгле. Зато лишняя подсистема с USB-стеком и потоком RPC крутилась
   # на ней постоянно, и левая половина отличалась от правой только этим.
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: cradio_left
 
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: cradio_right
     
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: settings_reset
 
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: sweep_dongle
 
   # Диагностическая сборка: логи по USB плюс метки времени прихода нажатий.
@@ -44,7 +44,7 @@ include:
   # что мак принимает нашу просьбу и даёт latency 0, — но кроме того она дважды
   # оказалась единственным способом отличить «половинка не доехала» от «донгл
   # шлёт не туда». Гадать вместо неё дороже, чем держать лишний таргет в CI.
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: sweep_dongle
     snippet: zmk-usb-logging
     cmake-args: -DCONFIG_SWEEP_DONGLE_DEBUG_LATENCY=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_SWEEP_DONGLE_DEBUG_LINKS=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
@@ -62,7 +62,7 @@ include:
   # ZMK_LOGGING_MINIMAL=y отключает тот самый default, и тогда уровень берётся
   # из выбора. Телеметрия линков сюда НЕ включена: её таймер будит процессор
   # 50 раз в секунду.
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: sweep_dongle
     snippet: zmk-usb-logging
     cmake-args: -DCONFIG_ZMK_LOGGING_MINIMAL=y -DCONFIG_ZMK_LOG_LEVEL_INF=y -DCONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON=y -DCONFIG_SWEEP_DONGLE_DEBUG_HOSTS=y
@@ -70,7 +70,7 @@ include:
 
   # Диагностика ЛЕВОЙ половинки. Раньше её не было вовсе, хотя жалобы на
   # отставание именно с левой: разбирать было нечем.
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: cradio_left
     snippet: zmk-usb-logging
     cmake-args: -DCONFIG_SWEEP_HALF_DEBUG_STATS=y -DCONFIG_ZMK_LOGGING_MINIMAL=y -DCONFIG_ZMK_LOG_LEVEL_INF=y
@@ -79,7 +79,7 @@ include:
   # Диагностика правой половинки: лог по USB плюс состояние отправки нажатий
   # и причина перезагрузки. Сценарий, ради которого появилась: после
   # перезагрузки донгла линк к правой есть, а нажатий с неё нет до её ресета.
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: cradio_right
     snippet: zmk-usb-logging
     cmake-args: -DCONFIG_SWEEP_HALF_DEBUG_STATS=y -DCONFIG_ZMK_LOG_LEVEL_INF=y

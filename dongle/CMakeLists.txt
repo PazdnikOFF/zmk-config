@@ -14,15 +14,21 @@ if(CONFIG_SWEEP_DONGLE_UI)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_HOST_LINK_GATT src/host_gatt.c)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_RESET_REASON src/reset_reason.c)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_LINKS src/link_stats.c)
+  # zmk#3522. Без --wrap ссылка на __real_ не слинкуется, так что защита либо
+  # активна, либо сборка падает.
+  if(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
+    zephyr_library_sources(src/split_guard.c)
+    zephyr_link_libraries(-Wl,--wrap=zmk_split_transport_central_peripheral_event_handler)
+  endif()
 endif()
 
 # Режим ОС по профилю хоста. Отдельная библиотека: к экрану он отношения не
 # имеет и живёт на донгле независимо от того, собран ли UI.
-if(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE OR CONFIG_SWEEP_DONGLE_SINGLE_HOST OR CONFIG_SWEEP_DONGLE_DEBUG_HOSTS OR CONFIG_SWEEP_DONGLE_BLE_ON_PROFILE_SWITCH)
+if(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE OR CONFIG_SWEEP_DONGLE_SINGLE_HOST OR CONFIG_SWEEP_DONGLE_DEBUG_HOSTS OR CONFIG_SWEEP_DONGLE_HOST_PROFILE_ADOPT)
   zephyr_library_named(sweep_dongle_os)
   zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_OS_BY_PROFILE src/os_profile.c)
-  zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_BLE_ON_PROFILE_SWITCH src/host_output.c)
+  zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_HOST_PROFILE_ADOPT src/host_profile.c)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_DEBUG_HOSTS src/host_log.c)
   zephyr_library_sources_ifdef(CONFIG_SWEEP_DONGLE_SINGLE_HOST src/host_solo.c)
 endif()

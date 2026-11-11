@@ -34,6 +34,24 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         refreshTitle()
     }
 
+    /// Значок меняется, пока идёт диктовка: колонка слушает — микрофон, распознаёт — текст.
+    func setDictationIndicator(_ indicator: DictationController.Indicator) {
+        let symbol: String
+        let label: String
+        switch indicator {
+        case .idle:
+            symbol = "keyboard"
+            label = "Sweep Dongle"
+        case .recording:
+            symbol = "mic.fill"
+            label = "Диктовка: запись"
+        case .transcribing:
+            symbol = "text.bubble"
+            label = "Диктовка: распознаю"
+        }
+        item.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)
+    }
+
     func update(state: DongleState?, linkUp: Bool, notificationsLive: Bool) {
         self.state = state
         self.linkUp = linkUp
@@ -90,6 +108,17 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         hintsItem.state = hints.isVisible ? .on : .off
         menu.addItem(hintsItem)
 
+        if dictationController?.isActive == true {
+            let cancel = NSMenuItem(
+                title: "Отменить диктовку", action: #selector(cancelDictation), keyEquivalent: "")
+            cancel.target = self
+            menu.addItem(cancel)
+        }
+        let dictation = NSMenuItem(
+            title: "Настройки диктовки…", action: #selector(openDictationSettings), keyEquivalent: ",")
+        dictation.target = self
+        menu.addItem(dictation)
+
         let pause = NSMenuItem(
             title: isPaused ? "Возобновить отправку" : "Приостановить отправку",
             action: #selector(togglePause), keyEquivalent: "")
@@ -116,6 +145,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func togglePause() { isPaused.toggle() }
+
+    @objc private func openDictationSettings() { DictationSettingsWindow.shared.show() }
+
+    @objc private func cancelDictation() { dictationController?.cancelCurrent(reason: "меню") }
 
     @objc private func toggleHints() { hints.setVisible(!hints.isVisible) }
 

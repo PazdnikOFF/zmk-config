@@ -18,6 +18,13 @@
     <string>1.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Связь с брокером диктовки на GMKtec в домашней сети.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>Отправляет показатели Mac на экран донгла Sweep.</string>
 </dict>

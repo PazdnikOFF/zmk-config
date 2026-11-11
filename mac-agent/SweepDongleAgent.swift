@@ -592,6 +592,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         bluetooth.wantsLayerNotifications = menuBar?.hints.isVisible ?? false
         menuBar?.hints.restore()
+        dictationController = DictationController(menuBar: menuBar)
         FirstRun.askIfNeeded()
 
         // Первая выборка CPU задаёт базу для дельты и смысла не несёт.

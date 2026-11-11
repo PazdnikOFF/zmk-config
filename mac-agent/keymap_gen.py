@@ -573,6 +573,8 @@ def generate(path):
         "conditional": read_conditional(text, defines),
         "combos": combos,
         "hints": access_hints(layers, combos, flags),
+        "access": layer_access(layers, combos, flags),
+        "modes": mode_switches(combos, flags, layers[0]["keys"]),
     }
 
 
@@ -646,6 +648,54 @@ def access_hints(layers, combos, flags):
     if mode:
         hints.append(mode)
     return hints
+
+
+HOW_CODE = {"удерживать": "hold", "вкл/выкл": "toggle", "перейти": "to", "на одно нажатие": "once"}
+
+
+def layer_access(layers, combos, flags):
+    """
+    Пути на слой для строки-легенды в окне: какие позиции нажать и как.
+
+    {layer, how: hold|toggle|to|once, positions: [..], on: слой, где это
+    работает (0 — с базы), combo: нажать вместе}.
+    """
+    flag_layers = {flags["win"], flags["lnx"]}
+    access = []
+    for src in layers:
+        for pos, key in enumerate(src["keys"]):
+            target = key.get("layer")
+            if key.get("kind") != "layer" or target in (0, *flag_layers):
+                continue
+            access.append({"layer": target, "how": HOW_CODE.get(key["note"]["mac"], "to"),
+                           "positions": [pos], "on": src["index"], "combo": False})
+    for combo in combos:
+        key = combo["binding"]
+        target = key.get("layer")
+        if key.get("kind") != "layer" or target in (0, *flag_layers):
+            continue
+        access.append({"layer": target, "how": HOW_CODE.get(key["note"]["mac"], "to"),
+                       "positions": combo["positions"],
+                       "on": combo["layers"][0] if combo["layers"] else 0, "combo": True})
+    # Накладки ОС поднимаются сами — на них клавишами не ходят.
+    return [a for a in access if a["on"] not in flag_layers]
+
+
+def mode_switches(combos, flags, base_keys):
+    """Комбо выбора режима ОС: {mode, keys: [R, T], positions, on}."""
+    codes = {0: "mac", flags["win"]: "win", flags["lnx"]: "lnx"}
+    result = []
+    for combo in combos:
+        key = combo["binding"]
+        if key.get("kind") != "layer" or key["note"]["mac"] != "перейти" or key["layer"] not in codes:
+            continue
+        result.append({
+            "mode": codes[key["layer"]],
+            "positions": combo["positions"],
+            "keys": [position_name(p, base_keys) for p in combo["positions"]],
+            "on": combo["layers"][0] if combo["layers"] else 0,
+        })
+    return result
 
 
 def cell_text(key, mode):

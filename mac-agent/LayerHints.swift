@@ -33,7 +33,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
     private var panel: HintsPanel?
     private var needsPlacement = true
     private let keyboard = KeyboardView()
-    private let hintsLabel = NSTextField(wrappingLabelWithString: "")
+    private let legend = LayerLegendView()
     private let statusLabel = NSTextField(labelWithString: "")
     private let modeControl = NSSegmentedControl()
     private let layerPopup = NSPopUpButton()
@@ -136,17 +136,14 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         layerPopup.action = #selector(layerChanged)
         layerPopup.setAccessibilityLabel("Слой для подсказок")
 
-        for label in [hintsLabel, statusLabel] {
-            label.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-            label.textColor = .secondaryLabelColor
-        }
-        hintsLabel.preferredMaxLayoutWidth = keyboard.intrinsicContentSize.width
+        statusLabel.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        statusLabel.textColor = .secondaryLabelColor
 
         let controls = NSStackView(views: [modeControl, layerPopup])
         controls.orientation = .horizontal
         controls.spacing = 8
 
-        let stack = NSStackView(views: [keyboard, hintsLabel, statusLabel, controls])
+        let stack = NSStackView(views: [keyboard, legend, statusLabel, controls])
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 6
@@ -220,13 +217,20 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
             (manualMode == nil && manualLayer == nil && liveMask != nil)
             ? liveMask! : keymap.mask(layer: layer, mode: mode)
 
+        let top = keymap.topWorkingLayer(in: mask)
+        keyboard.keymap = keymap
+        keyboard.topLayer = top
         keyboard.mode = mode
         keyboard.keys = keymap.resolve(mask: mask)
+
+        legend.keymap = keymap
+        legend.currentLayer = top
+        legend.currentMode = mode
+        legend.toolTip = keymap.hints.map { "• " + $0.text }.joined(separator: "\n")
 
         let manual = manualMode != nil || manualLayer != nil
         panel.title = "\(keymap.layerName(layer)) · \(mode.title)\(manual ? " (вручную)" : "")"
 
-        hintsLabel.stringValue = keymap.hints.map { "• " + $0.text }.joined(separator: "\n")
         statusLabel.stringValue = statusText(manual: manual)
     }
 
@@ -240,7 +244,9 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         if !notificationsLive {
             return "Донгл не шлёт уведомления о слое — обновление в паузах печати"
         }
-        return manual ? "Показан выбранный слой; клавиатура сейчас на другом" : ""
+        return manual
+            ? "Показан выбранный слой; клавиатура сейчас на другом"
+            : "Жёлтым — при удержании · оранжевая точка — своя клавиша для ОС"
     }
 
     private func rebuildLayerPopup(_ keymap: Keymap) {
@@ -266,6 +272,9 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
 final class KeyboardView: NSView {
     var keys: [ResolvedKey] = [] { didSet { needsDisplay = true } }
     var mode: OSMode = .mac { didSet { needsDisplay = true } }
+    var keymap: Keymap? { didSet { needsDisplay = true } }
+    /// Верхний рабочий слой: от него зависит, какие комбо подписывать.
+    var topLayer = 0 { didSet { needsDisplay = true } }
 
     private let keyW: CGFloat = 60
     private let keyH: CGFloat = 46
@@ -281,7 +290,7 @@ final class KeyboardView: NSView {
     override var isFlipped: Bool { true }
 
     override var intrinsicContentSize: NSSize {
-        NSSize(width: 10 * keyW + 8 * gap + split, height: 4 * (keyH + gap) + 30)
+        NSSize(width: 10 * keyW + 8 * gap + split, height: 4 * (keyH + gap) + 42)
     }
 
     /// Прямоугольник клавиши по позиции ZMK (0–33).
@@ -316,6 +325,53 @@ final class KeyboardView: NSView {
         for (position, key) in keys.enumerated() where position < 34 {
             drawKey(key, in: frame(for: position))
         }
+        drawCombos()
+    }
+
+    /*
+     * Комбо прямо на схеме: плашка между клавишами, которые жмут вместе.
+     * Слоевые — цветом слоя под большими пальцами; выбор режима ОС — серым
+     * в стыке пары, только на том слое, где комбо работает.
+     */
+    private func drawCombos() {
+        guard let keymap else { return }
+
+        for access in keymap.access ?? [] where access.combo && (access.on == 0 || access.on == topLayer) {
+            let frames = access.positions.map(frame(for:))
+            guard let first = frames.first else { continue }
+            let union = frames.dropFirst().reduce(first) { $0.union($1) }
+            let color = LayerPalette.color(access.layer, in: keymap)
+            let glyph = access.how == "toggle" ? "⇄ " : ""
+            drawCapsule(
+                glyph + keymap.layerName(access.layer),
+                center: NSPoint(x: union.midX, y: union.maxY + 9), fill: color)
+        }
+
+        for modeSwitch in keymap.modes ?? [] where modeSwitch.on == topLayer {
+            let frames = modeSwitch.positions.map(frame(for:))
+            guard frames.count == 2, let osMode = modeSwitch.osMode else { continue }
+            // Верхняя кромка стыка пары: подпись клавиши стоит по центру и
+            // остаётся видна.
+            let center = NSPoint(
+                x: (frames[0].midX + frames[1].midX) / 2,
+                y: max(frames[0].minY, frames[1].minY) + 8)
+            let fill: NSColor = osMode == mode ? .systemGreen : .systemGray
+            drawCapsule(osMode.title, center: center, fill: fill)
+        }
+    }
+
+    private func drawCapsule(_ text: String, center: NSPoint, fill: NSColor) {
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 9.5, weight: .bold),
+            .foregroundColor: NSColor.white,
+        ]
+        let size = (text as NSString).size(withAttributes: attrs)
+        let rect = NSRect(
+            x: center.x - size.width / 2 - 6, y: center.y - 7.5, width: size.width + 12, height: 15)
+        fill.withAlphaComponent(0.9).setFill()
+        NSBezierPath(roundedRect: rect, xRadius: 7.5, yRadius: 7.5).fill()
+        (text as NSString).draw(
+            at: NSPoint(x: rect.minX + 6, y: rect.midY - size.height / 2), withAttributes: attrs)
     }
 
     private func drawKey(_ key: ResolvedKey, in rect: NSRect) {
@@ -328,8 +384,8 @@ final class KeyboardView: NSView {
             fill = NSColor.white.withAlphaComponent(0.03)
         } else if danger {
             fill = NSColor.systemRed.withAlphaComponent(0.38)
-        } else if binding.kind == "layer" {
-            fill = NSColor.controlAccentColor.withAlphaComponent(0.35)
+        } else if binding.kind == "layer", let keymap, let layer = binding.layer {
+            fill = LayerPalette.color(layer, in: keymap).withAlphaComponent(0.55)
         } else if key.fromBelow {
             fill = NSColor.white.withAlphaComponent(0.05)
         } else {
@@ -358,16 +414,21 @@ final class KeyboardView: NSView {
         let note = binding.note?[mode] ?? nil
         let inner = rect.insetBy(dx: 4, dy: 3)
 
+        // Действие при удержании — жёлтым вверху справа, заметно, но не
+        // крупнее основного.
+        var top: CGFloat = 8
         if let hold = binding.hold?[mode] {
-            draw(
-                hold, in: NSRect(x: inner.minX, y: inner.minY, width: inner.width, height: 11),
-                size: 9, color: secondary, alignment: .right)
+            let color = key.fromBelow ? NSColor.systemYellow.withAlphaComponent(0.45) : .systemYellow
+            drawBold(
+                hold, in: NSRect(x: inner.minX, y: inner.minY - 1, width: inner.width, height: 14),
+                size: 11.5, color: color)
+            top = 12
         }
 
         let noteHeight: CGFloat = note == nil ? 0 : 11
         let labelRect = NSRect(
-            x: inner.minX, y: inner.minY + 8, width: inner.width,
-            height: inner.height - 8 - noteHeight)
+            x: inner.minX, y: inner.minY + top, width: inner.width,
+            height: inner.height - top - noteHeight)
         drawFitting(label, in: labelRect, color: primary)
 
         if let note {
@@ -420,6 +481,11 @@ final class KeyboardView: NSView {
             .max() ?? 0
     }
 
+    private func drawBold(_ text: String, in rect: NSRect, size: CGFloat, color: NSColor) {
+        let attrs = attributes(size: size, weight: .bold, color: color, alignment: .right)
+        (text as NSString).draw(with: rect, options: [.usesLineFragmentOrigin], attributes: attrs)
+    }
+
     private func draw(
         _ text: String, in rect: NSRect, size: CGFloat, color: NSColor, alignment: NSTextAlignment
     ) {
@@ -430,5 +496,181 @@ final class KeyboardView: NSView {
         (text as NSString).draw(
             with: rect, options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
             attributes: attrs)
+    }
+}
+
+// MARK: - Цвета слоёв
+
+/// Свой цвет у каждого рабочего слоя: в строке-легенде, на клавишах перехода
+/// и на плашках комбо. Системные цвета — подстраиваются под тему и контраст.
+enum LayerPalette {
+    private static let colors: [NSColor] = [
+        .systemBlue, .systemPurple, .systemGreen, .systemTeal, .systemPink, .systemIndigo,
+        .systemBrown,
+    ]
+
+    static func color(_ layer: Int, in keymap: Keymap) -> NSColor {
+        let order = keymap.workingLayers.map(\.index).filter { $0 != 0 }
+        guard let i = order.firstIndex(of: layer) else { return .systemGray }
+        return colors[i % colors.count]
+    }
+}
+
+// MARK: - Строка «как попасть на слой»
+
+/*
+ * Одна строка цветных плашек: на каждой — значок четырёх больших пальцев с
+ * подсвеченными нужными, значок «удерживать» или «вкл/выкл» и имя слоя.
+ * Плашка текущего слоя залита. В конце — выбор режима ОС парами клавиш.
+ */
+final class LayerLegendView: NSView {
+    var keymap: Keymap? { didSet { needsDisplay = true } }
+    var currentLayer = 0 { didSet { needsDisplay = true } }
+    var currentMode: OSMode = .mac { didSet { needsDisplay = true } }
+
+    private let height: CGFloat = 24
+    private let spacing: CGFloat = 6
+
+    override var isFlipped: Bool { true }
+
+    override var intrinsicContentSize: NSSize { NSSize(width: 676, height: height) }
+
+    private struct Chip {
+        let positions: [Int]
+        let symbol: String?
+        let text: String
+        let color: NSColor
+        let filled: Bool
+    }
+
+    private func chips(_ keymap: Keymap) -> [Chip] {
+        let order = keymap.workingLayers.map(\.index)
+        let access = (keymap.access ?? []).sorted {
+            (order.firstIndex(of: $0.layer) ?? 99) < (order.firstIndex(of: $1.layer) ?? 99)
+        }
+
+        var result = access.map { a in
+            Chip(
+                positions: a.positions,
+                symbol: a.how == "hold" ? "hand.point.down.fill" : "togglepower",
+                text: keymap.layerName(a.layer),
+                color: LayerPalette.color(a.layer, in: keymap),
+                filled: a.layer == currentLayer)
+        }
+
+        if let modes = keymap.modes, !modes.isEmpty {
+            let pairs = modes.map { m in
+                "\(m.keys.joined(separator: "+")) \(m.osMode?.title ?? m.mode)"
+            }
+            let on = modes[0].on
+            result.append(
+                Chip(
+                    positions: [], symbol: "desktopcomputer",
+                    text: pairs.joined(separator: " · ") + (on != 0 ? " (на \(keymap.layerName(on)))" : ""),
+                    color: on != 0 ? LayerPalette.color(on, in: keymap) : .systemGray,
+                    filled: currentLayer == on))
+        }
+
+        return result
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let keymap else { return }
+
+        var fontSize: CGFloat = 11.5
+        var list = chips(keymap)
+        // Не влезает в строку — ужимаем шрифт, а не переносим.
+        while fontSize > 8.5, totalWidth(list, fontSize) > bounds.width {
+            fontSize -= 0.5
+            list = chips(keymap)
+        }
+
+        var x: CGFloat = 0
+        for chip in list {
+            x += drawChip(chip, at: x, fontSize: fontSize) + spacing
+        }
+    }
+
+    private func textAttrs(_ chip: Chip, _ size: CGFloat) -> [NSAttributedString.Key: Any] {
+        [
+            .font: NSFont.systemFont(ofSize: size, weight: .semibold),
+            // Цвет слоя — у фона и значков; текст обычный, чтобы читался.
+            .foregroundColor: chip.filled ? NSColor.white : NSColor.labelColor,
+        ]
+    }
+
+    private func iconWidth(_ chip: Chip) -> CGFloat {
+        chip.positions.allSatisfy { $0 >= 30 } && !chip.positions.isEmpty ? 34 : 0
+    }
+
+    private func chipWidth(_ chip: Chip, _ size: CGFloat) -> CGFloat {
+        let text = (chip.text as NSString).size(withAttributes: textAttrs(chip, size)).width
+        let keys = iconWidth(chip) == 0 && !chip.positions.isEmpty ? 0 : iconWidth(chip)
+        return 8 + keys + (keys > 0 ? 5 : 0) + (chip.symbol != nil ? size + 4 : 0) + text + 8
+    }
+
+    private func totalWidth(_ list: [Chip], _ size: CGFloat) -> CGFloat {
+        list.map { chipWidth($0, size) }.reduce(0, +) + spacing * CGFloat(max(0, list.count - 1))
+    }
+
+    @discardableResult
+    private func drawChip(_ chip: Chip, at x: CGFloat, fontSize: CGFloat) -> CGFloat {
+        let width = chipWidth(chip, fontSize)
+        let rect = NSRect(x: x, y: 2, width: width, height: height - 4)
+        let path = NSBezierPath(roundedRect: rect, xRadius: rect.height / 2, yRadius: rect.height / 2)
+        chip.color.withAlphaComponent(chip.filled ? 0.85 : 0.22).setFill()
+        path.fill()
+        if !chip.filled {
+            chip.color.withAlphaComponent(0.7).setStroke()
+            path.lineWidth = 1
+            path.stroke()
+        }
+
+        var cursor = rect.minX + 8
+
+        if iconWidth(chip) > 0 {
+            drawThumbs(chip, in: NSRect(x: cursor, y: rect.minY + 4, width: 34, height: rect.height - 8))
+            cursor += 34 + 5
+        }
+
+        let tint: NSColor = chip.filled ? .white : chip.color
+        if let name = chip.symbol,
+            let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
+                .withSymbolConfiguration(
+                    NSImage.SymbolConfiguration(pointSize: fontSize - 1, weight: .semibold)
+                        .applying(NSImage.SymbolConfiguration(paletteColors: [tint])))
+        {
+            let side = fontSize
+            image.draw(
+                in: NSRect(x: cursor, y: rect.midY - side / 2, width: side, height: side),
+                from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
+            cursor += side + 4
+        }
+
+        let attrs = textAttrs(chip, fontSize)
+        let size = (chip.text as NSString).size(withAttributes: attrs)
+        (chip.text as NSString).draw(
+            at: NSPoint(x: cursor, y: rect.midY - size.height / 2), withAttributes: attrs)
+
+        return width
+    }
+
+    /// Четыре больших пальца: два слева, два справа; нужные — залиты.
+    private func drawThumbs(_ chip: Chip, in rect: NSRect) {
+        let w: CGFloat = 6.5
+        let xs: [Int: CGFloat] = [30: 0, 31: w + 2, 32: 2 * w + 7, 33: 3 * w + 9]
+        let on: NSColor = chip.filled ? .white : chip.color
+        for (position, dx) in xs {
+            let key = NSRect(x: rect.minX + dx, y: rect.minY, width: w, height: rect.height)
+            let path = NSBezierPath(roundedRect: key, xRadius: 1.5, yRadius: 1.5)
+            if chip.positions.contains(position) {
+                on.setFill()
+                path.fill()
+            } else {
+                on.withAlphaComponent(0.45).setStroke()
+                path.lineWidth = 1
+                path.stroke()
+            }
+        }
     }
 }

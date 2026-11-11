@@ -81,6 +81,27 @@ struct KeymapHint: Decodable {
     let text: String
 }
 
+/// Как попасть на слой: удержать / нажать вместе (комбо) и где это работает.
+struct LayerAccess: Decodable {
+    let layer: Int
+    /// hold, toggle, to, once.
+    let how: String
+    let positions: [Int]
+    /// На каком слое работает; 0 — с базы (и со всех, если это комбо).
+    let on: Int
+    let combo: Bool
+}
+
+/// Комбо выбора режима ОС: «R+T — Мак» на слое SYM_2.
+struct ModeSwitch: Decodable {
+    let mode: String
+    let positions: [Int]
+    let keys: [String]
+    let on: Int
+
+    var osMode: OSMode? { OSMode(rawValue: mode) }
+}
+
 struct KeymapFlags: Decodable {
     let win: Int
     let lnx: Int
@@ -104,6 +125,9 @@ struct Keymap: Decodable {
     let conditional: [ConditionalLayer]
     let combos: [KeymapCombo]
     let hints: [KeymapHint]
+    /// Появились позже hints — в старом keymap.json их может не быть.
+    let access: [LayerAccess]?
+    let modes: [ModeSwitch]?
 
     // MARK: - Загрузка
 

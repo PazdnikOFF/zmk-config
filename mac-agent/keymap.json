@@ -5595,5 +5595,83 @@
    "layer": -1,
    "text": "Режим ОС на SYM_2: R+T Мак, F+G Windows, V+B Linux"
   }
+ ],
+ "access": [
+  {
+   "layer": 3,
+   "how": "hold",
+   "positions": [
+    30
+   ],
+   "on": 0,
+   "combo": false
+  },
+  {
+   "layer": 1,
+   "how": "hold",
+   "positions": [
+    33
+   ],
+   "on": 0,
+   "combo": false
+  },
+  {
+   "layer": 2,
+   "how": "toggle",
+   "positions": [
+    32,
+    33
+   ],
+   "on": 0,
+   "combo": true
+  },
+  {
+   "layer": 4,
+   "how": "toggle",
+   "positions": [
+    30,
+    31
+   ],
+   "on": 0,
+   "combo": true
+  }
+ ],
+ "modes": [
+  {
+   "mode": "mac",
+   "positions": [
+    3,
+    4
+   ],
+   "keys": [
+    "R",
+    "T"
+   ],
+   "on": 2
+  },
+  {
+   "mode": "win",
+   "positions": [
+    13,
+    14
+   ],
+   "keys": [
+    "F",
+    "G"
+   ],
+   "on": 2
+  },
+  {
+   "mode": "lnx",
+   "positions": [
+    23,
+    24
+   ],
+   "keys": [
+    "V",
+    "B"
+   ],
+   "on": 2
+  }
  ]
 }

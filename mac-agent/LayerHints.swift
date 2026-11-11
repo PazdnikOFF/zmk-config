@@ -32,6 +32,38 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
 
     private var panel: HintsPanel?
     private var needsPlacement = true
+
+    /*
+     * Shift и Caps Lock опрашиваются 20 раз в секунду, и только пока окно на
+     * экране. CGEventSource.flagsState не требует разрешений (в отличие от
+     * глобального перехвата событий) и стоит копейки.
+     */
+    private var modifierTimer: Timer?
+    private var shiftHeld = false
+    private var capsLock = false
+
+    private func startModifierPolling() {
+        guard modifierTimer == nil else { return }
+        modifierTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            self?.pollModifiers()
+        }
+        pollModifiers()
+    }
+
+    private func stopModifierPolling() {
+        modifierTimer?.invalidate()
+        modifierTimer = nil
+    }
+
+    private func pollModifiers() {
+        let flags = CGEventSource.flagsState(.combinedSessionState)
+        let shift = flags.contains(.maskShift)
+        let caps = flags.contains(.maskAlphaShift)
+        guard shift != shiftHeld || caps != capsLock else { return }
+        shiftHeld = shift
+        capsLock = caps
+        refresh()
+    }
     private let keyboard = KeyboardView()
     private let legend = LayerLegendView()
     private let statusLabel = NSTextField(labelWithString: "")
@@ -62,7 +94,12 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
 
     func setVisible(_ visible: Bool) {
         UserDefaults.standard.set(visible, forKey: Self.visibleKey)
-        if visible { show() } else { panel?.orderOut(nil) }
+        if visible {
+            show()
+        } else {
+            panel?.orderOut(nil)
+            stopModifierPolling()
+        }
         onVisibilityChange?(visible)
     }
 
@@ -81,6 +118,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         refresh()
         place(panel)
         panel.orderFrontRegardless()
+        startModifierPolling()
     }
 
     /*
@@ -171,6 +209,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        stopModifierPolling()
         UserDefaults.standard.set(false, forKey: Self.visibleKey)
         onVisibilityChange?(false)
     }
@@ -220,6 +259,8 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
 
         let top = keymap.topWorkingLayer(in: mask)
         keyboard.layout = InputLayout.shared
+        keyboard.shiftHeld = shiftHeld
+        keyboard.capsLock = capsLock
         keyboard.keymap = keymap
         keyboard.topLayer = top
         keyboard.mode = mode
@@ -232,8 +273,9 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
 
         let manual = manualMode != nil || manualLayer != nil
         let language = mode == .mac ? " · \(InputLayout.shared.language)" : ""
+        let caps = capsLock ? " · ⇪ Caps Lock" : ""
         panel.title =
-            "\(keymap.layerName(layer)) · \(mode.title)\(language)\(manual ? " (вручную)" : "")"
+            "\(keymap.layerName(layer)) · \(mode.title)\(language)\(caps)\(manual ? " (вручную)" : "")"
 
         statusLabel.stringValue = statusText(manual: manual)
     }
@@ -279,6 +321,9 @@ final class KeyboardView: NSView {
     var keymap: Keymap? { didSet { needsDisplay = true } }
     /// Раскладка macOS для печатных клавиш; используется только в режиме Мак.
     var layout: InputLayout? { didSet { needsDisplay = true } }
+    /// Зажат ли Shift и включён ли Caps Lock на маке прямо сейчас.
+    var shiftHeld = false { didSet { if shiftHeld != oldValue { needsDisplay = true } } }
+    var capsLock = false { didSet { if capsLock != oldValue { needsDisplay = true } } }
     /// Верхний рабочий слой: от него зависит, какие комбо подписывать.
     var topLayer = 0 { didSet { needsDisplay = true } }
 
@@ -392,6 +437,9 @@ final class KeyboardView: NSView {
             fill = NSColor.systemRed.withAlphaComponent(0.38)
         } else if binding.kind == "layer", let keymap, let layer = binding.layer {
             fill = LayerPalette.color(layer, in: keymap).withAlphaComponent(0.55)
+        } else if isActiveModifier(binding) {
+            // Shift зажат прямо сейчас — подсвечиваем саму клавишу.
+            fill = NSColor.systemYellow.withAlphaComponent(0.55)
         } else if key.fromBelow {
             fill = NSColor.white.withAlphaComponent(0.05)
         } else {
@@ -447,10 +495,16 @@ final class KeyboardView: NSView {
         }
     }
 
+    private func isActiveModifier(_ binding: KeyBinding) -> Bool {
+        shiftHeld && binding.kind == "mod" && (binding.label?.mac.hasSuffix("Shift") ?? false)
+    }
+
     /// В режиме Мак печатная клавиша подписывается тем, что она напечатает в
     /// выбранной на маке раскладке (Й вместо Q); иначе — подпись из keymap.
     private func text(_ code: KeyCode?, fallback: String?) -> String? {
-        guard mode == .mac, let code, let layout, let typed = layout.label(for: code) else {
+        guard mode == .mac, let code, let layout,
+            let typed = layout.label(for: code, shift: shiftHeld, capsLock: capsLock)
+        else {
             return fallback
         }
         return typed

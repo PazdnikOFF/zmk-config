@@ -72,9 +72,15 @@ final class InputLayout {
         layoutData = Self.layoutData(of: source)
     }
 
-    /// Подпись для клавиши-кода из keymap.json; nil — переводить нечего.
-    func label(for code: KeyCode) -> String? {
-        let cacheKey = code.key + (code.shift ? "+S" : "")
+    /*
+     * Подпись для клавиши-кода из keymap.json; nil — переводить нечего.
+     *
+     * shift и capsLock — что сейчас зажато на маке: подпись показывает ровно
+     * то, что напечатается, то есть й без Shift и Й с ним или с Caps Lock.
+     */
+    func label(for code: KeyCode, shift: Bool = false, capsLock: Bool = false) -> String? {
+        let shifted = code.shift || shift
+        let cacheKey = code.key + (shifted ? "+S" : "") + (capsLock ? "+L" : "")
         if let hit = cache[cacheKey] { return hit }
 
         guard let virtualKey = Self.virtualKeys[code.key], let layoutData else { return nil }
@@ -87,7 +93,9 @@ final class InputLayout {
             var deadKeyState: UInt32 = 0
             var length = 0
             var chars = [UniChar](repeating: 0, count: 4)
-            let modifiers: UInt32 = code.shift ? UInt32(shiftKey >> 8) & 0xFF : 0
+            var modifiers: UInt32 = 0
+            if shifted { modifiers |= UInt32(shiftKey >> 8) & 0xFF }
+            if capsLock { modifiers |= UInt32(alphaLock >> 8) & 0xFF }
 
             let status = UCKeyTranslate(
                 layout, UInt16(virtualKey), UInt16(kUCKeyActionDisplay), modifiers,
@@ -98,12 +106,8 @@ final class InputLayout {
             return String(utf16CodeUnits: chars, count: length)
         }
 
-        // Буквенные клавиши — заглавными, как на колпачках. Остальные — ровно
-        // то, что напечатается: на SYM у [ и { разные «х» и «Х».
-        let isLetterKey = code.key.count == 1 && !code.shift
-        let result = text.map { isLetterKey ? $0.uppercased() : $0 }
-        if let result { cache[cacheKey] = result }
-        return result
+        if let text { cache[cacheKey] = text }
+        return text
     }
 
     /// Имена физических клавиш из keymap_gen.py -> виртуальные коды macOS.

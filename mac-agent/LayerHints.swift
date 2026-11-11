@@ -31,6 +31,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
     var onVisibilityChange: ((Bool) -> Void)?
 
     private var panel: HintsPanel?
+    private var needsPlacement = true
     private let keyboard = KeyboardView()
     private let hintsLabel = NSTextField(wrappingLabelWithString: "")
     private let statusLabel = NSTextField(labelWithString: "")
@@ -78,7 +79,28 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         let panel = self.panel ?? makePanel()
         self.panel = panel
         refresh()
+        place(panel)
         panel.orderFrontRegardless()
+    }
+
+    /*
+     * Размер — по содержимому (setContentSize держит нижний левый угол, окно
+     * растёт вверх). Первый раз и если сохранённое место ушло за экраны
+     * (отключили монитор) — в правый нижний угол основного экрана.
+     */
+    private func place(_ panel: HintsPanel) {
+        if let content = panel.contentView {
+            panel.setContentSize(content.fittingSize)
+        }
+
+        let visible = NSScreen.screens.contains { $0.visibleFrame.contains(panel.frame) }
+        guard needsPlacement || !visible,
+            let screen = (NSScreen.screens.first ?? NSScreen.main)?.visibleFrame
+        else { return }
+
+        panel.setFrameOrigin(
+            NSPoint(x: screen.maxX - panel.frame.width - 20, y: screen.minY + 20))
+        needsPlacement = false
     }
 
     private func makePanel() -> HintsPanel {
@@ -141,13 +163,10 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         ])
         panel.contentView = content
 
-        // Первое появление — справа внизу; дальше AppKit сам ставит туда,
-        // куда окно передвинули в прошлый раз.
+        // Место, куда окно передвинули в прошлый раз; нет его — place()
+        // поставит в угол экрана.
         panel.setContentSize(content.fittingSize)
-        if let screen = NSScreen.main?.visibleFrame {
-            panel.setFrameOrigin(
-                NSPoint(x: screen.maxX - panel.frame.width - 20, y: screen.minY + 20))
-        }
+        needsPlacement = !panel.setFrameUsingName(Self.autosaveName)
         panel.setFrameAutosaveName(Self.autosaveName)
 
         return panel
@@ -276,7 +295,7 @@ final class KeyboardView: NSView {
             case 32: column = 5
             default: column = 6
             }
-            let left = x(forColumn: column) + (position < 32 ? keyW / 3 : -keyW / 3)
+            let left = x(forColumn: column) + (position < 32 ? keyW / 6 : -keyW / 6)
             let top = 3 * (keyH + gap) + 14 + (position == 30 || position == 33 ? 0 : 6)
             return NSRect(x: left, y: top, width: keyW, height: keyH)
         }

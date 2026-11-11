@@ -488,7 +488,13 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     ) {
         guard characteristic.uuid == kStateUUID, let data = characteristic.value else { return }
 
+        let previous = lastState?.layerState
         lastState = DongleState(data)
+
+        // Смена слоя — в лог: по нему проверяется, что уведомления доходят.
+        if let state = lastState, let mask = state.layerState, mask != previous {
+            log("слой: \(state.layerName) · \(state.osMode?.title ?? "?") (маска 0x\(String(mask, radix: 16)))")
+        }
         pushState()
     }
 

@@ -13,6 +13,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private var state: DongleState?
     private var linkUp = false
+    private var notificationsLive = false
+
+    /// Окно подсказок раскладки; галочка «Подсказки» в меню.
+    let hints = LayerHintsController()
 
     var isPaused = false
 
@@ -30,10 +34,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         refreshTitle()
     }
 
-    func update(state: DongleState?, linkUp: Bool) {
+    func update(state: DongleState?, linkUp: Bool, notificationsLive: Bool) {
         self.state = state
         self.linkUp = linkUp
+        self.notificationsLive = notificationsLive
         refreshTitle()
+        hints.update(state: state, linkUp: linkUp, notificationsLive: notificationsLive)
     }
 
     private func refreshTitle() {
@@ -61,6 +67,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(disabled("Донгл                    \(DongleState.percentText(state.battDongle))"))
         menu.addItem(.separator())
         menu.addItem(disabled("Слой: \(state.layerName)"))
+        if let mode = state.osMode {
+            menu.addItem(disabled("Режим ОС: \(mode.title)"))
+        }
         menu.addItem(disabled("Выход: \(state.outputDescription)"))
 
         if let slot = state.leftSlot {
@@ -74,6 +83,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     private func addControls(to menu: NSMenu) {
         menu.addItem(.separator())
+
+        let hintsItem = NSMenuItem(
+            title: "Подсказки", action: #selector(toggleHints), keyEquivalent: "")
+        hintsItem.target = self
+        hintsItem.state = hints.isVisible ? .on : .off
+        menu.addItem(hintsItem)
 
         let pause = NSMenuItem(
             title: isPaused ? "Возобновить отправку" : "Приостановить отправку",
@@ -101,6 +116,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func togglePause() { isPaused.toggle() }
+
+    @objc private func toggleHints() { hints.setVisible(!hints.isVisible) }
 
     @objc private func toggleLoginItem() { LoginItem.setEnabled(!LoginItem.isEnabled) }
 

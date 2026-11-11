@@ -16,6 +16,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include <zmk/event_manager.h>
+#include <zmk/events/layer_state_changed.h>
+
 #include "dongle_ui.h"
 #include "host_proto.h"
 
@@ -69,9 +72,13 @@ static ssize_t write_metrics(struct bt_conn *conn, const struct bt_gatt_attr *at
 }
 
 /*
- * Состояние отдаётся только по запросу и без уведомлений. Уведомления
- * означали бы обмен в эфире в произвольный момент, в том числе посреди печати,
- * а мы ровно от этого и уходили: агент читает состояние сам и только в паузах.
+ * Состояние отдаётся по запросу: агент читает его сам и только в паузах печати.
+ *
+ * Исключение — смена слоя, ради окна подсказок раскладки на маке: ему нужно
+ * показать новый слой сразу, а не через паузу в печати. Уведомление уходит
+ * только тем, кто включил CCC, а агент включает его лишь пока окно открыто.
+ * Цена — один короткий пакет на смену слоя по уже существующему соединению;
+ * без окна в эфир по своей инициативе донгл не выходит, как и раньше.
  */
 static ssize_t read_state(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf,
                           uint16_t len, uint16_t offset) {
@@ -83,10 +90,54 @@ static ssize_t read_state(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 BT_GATT_SERVICE_DEFINE(sweep_host_svc, BT_GATT_PRIMARY_SERVICE(&host_service_uuid),
-                       BT_GATT_CHARACTERISTIC(&host_state_uuid.uuid, BT_GATT_CHRC_READ,
+                       BT_GATT_CHARACTERISTIC(&host_state_uuid.uuid,
+                                              BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
                                               BT_GATT_PERM_READ_ENCRYPT, read_state, NULL, NULL),
+                       BT_GATT_CCC(NULL, BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
                        BT_GATT_CHARACTERISTIC(&host_metrics_uuid.uuid,
                                               BT_GATT_CHRC_WRITE |
                                                   BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                               BT_GATT_PERM_WRITE_ENCRYPT, NULL, write_metrics,
                                               NULL));
+
+/*
+ * Уведомление о смене слоя.
+ *
+ * Одна смена слоя в ZMK — это пачка событий: &mo поднимает SYM, следом
+ * conditional_layers поднимает накладку SYM_W. Отправка вынесена в работу, и
+ * вся пачка, пришедшая до её запуска, уходит одним пакетом с итоговой маской.
+ *
+ * Атрибут значения — третий в сервисе: [0] сервис, [1] объявление
+ * характеристики, [2] её значение.
+ */
+static uint32_t notified_layers = UINT32_MAX;
+
+static void notify_layer_work_cb(struct k_work *work) {
+    ARG_UNUSED(work);
+
+    struct dongle_public_state state;
+
+    dongle_ui_fill_state(&state);
+
+    if (state.layer_state == notified_layers) {
+        return;
+    }
+
+    /* Подписчиков нет — bt_gatt_notify вернёт ошибку, это нормально. */
+    if (bt_gatt_notify(NULL, &sweep_host_svc.attrs[2], &state, sizeof(state)) == 0) {
+        notified_layers = state.layer_state;
+    }
+}
+
+static K_WORK_DEFINE(notify_layer_work, notify_layer_work_cb);
+
+static int host_gatt_layer_listener(const zmk_event_t *eh) {
+    if (as_zmk_layer_state_changed(eh) != NULL) {
+        k_work_submit(&notify_layer_work);
+    }
+
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(sweep_host_gatt, host_gatt_layer_listener);
+ZMK_SUBSCRIPTION(sweep_host_gatt, zmk_layer_state_changed);

@@ -1,0 +1,5599 @@
+{
+ "source": "config/cradio.keymap",
+ "keyCount": 34,
+ "flags": {
+  "win": 6,
+  "lnx": 7
+ },
+ "layers": [
+  {
+   "index": 0,
+   "node": "default_layer",
+   "name": "BASE",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Q",
+      "win": "Q",
+      "lnx": "Q"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "W",
+      "win": "W",
+      "lnx": "W"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "E",
+      "win": "E",
+      "lnx": "E"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "R",
+      "win": "R",
+      "lnx": "R"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "T",
+      "win": "T",
+      "lnx": "T"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Y",
+      "win": "Y",
+      "lnx": "Y"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "U",
+      "win": "U",
+      "lnx": "U"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "I",
+      "win": "I",
+      "lnx": "I"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "O",
+      "win": "O",
+      "lnx": "O"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "P",
+      "win": "P",
+      "lnx": "P"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     },
+     "hold": {
+      "mac": "[",
+      "win": "[",
+      "lnx": "["
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "A",
+      "win": "A",
+      "lnx": "A"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "S",
+      "win": "S",
+      "lnx": "S"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "D",
+      "win": "D",
+      "lnx": "D"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F",
+      "win": "F",
+      "lnx": "F"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "G",
+      "win": "G",
+      "lnx": "G"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "H",
+      "win": "H",
+      "lnx": "H"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "J",
+      "win": "J",
+      "lnx": "J"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "K",
+      "win": "K",
+      "lnx": "K"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "L",
+      "win": "L",
+      "lnx": "L"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": ";",
+      "win": ";",
+      "lnx": ";"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     },
+     "hold": {
+      "mac": "'",
+      "win": "'",
+      "lnx": "'"
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Z",
+      "win": "Z",
+      "lnx": "Z"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "X",
+      "win": "X",
+      "lnx": "X"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "C",
+      "win": "C",
+      "lnx": "C"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "V",
+      "win": "V",
+      "lnx": "V"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "B",
+      "win": "B",
+      "lnx": "B"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "N",
+      "win": "N",
+      "lnx": "N"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "M",
+      "win": "M",
+      "lnx": "M"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     },
+     "hold": {
+      "mac": "]",
+      "win": "]",
+      "lnx": "]"
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": ",",
+      "win": ",",
+      "lnx": ","
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": ".",
+      "win": ".",
+      "lnx": "."
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "/",
+      "win": "/",
+      "lnx": "/"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     },
+     "hold": {
+      "mac": "\\",
+      "win": "\\",
+      "lnx": "\\"
+     }
+    },
+    {
+     "t": "key",
+     "kind": "layer",
+     "layer": 3,
+     "label": {
+      "mac": "FNC",
+      "win": "FNC",
+      "lnx": "FNC"
+     },
+     "note": {
+      "mac": "удерживать",
+      "win": "удерживать",
+      "lnx": "удерживать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Space",
+      "win": "Space",
+      "lnx": "Space"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⇧ Shift",
+      "win": "⇧ Shift",
+      "lnx": "⇧ Shift"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "layer",
+     "layer": 1,
+     "label": {
+      "mac": "SYM",
+      "win": "SYM",
+      "lnx": "SYM"
+     },
+     "note": {
+      "mac": "удерживать",
+      "win": "удерживать",
+      "lnx": "удерживать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    }
+   ]
+  },
+  {
+   "index": 1,
+   "node": "sym_layer",
+   "name": "SYM",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "1",
+      "win": "1",
+      "lnx": "1"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "2",
+      "win": "2",
+      "lnx": "2"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "3",
+      "win": "3",
+      "lnx": "3"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "4",
+      "win": "4",
+      "lnx": "4"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "5",
+      "win": "5",
+      "lnx": "5"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "6",
+      "win": "6",
+      "lnx": "6"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "7",
+      "win": "7",
+      "lnx": "7"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "8",
+      "win": "8",
+      "lnx": "8"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "9",
+      "win": "9",
+      "lnx": "9"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "0",
+      "win": "0",
+      "lnx": "0"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "#",
+      "win": "#",
+      "lnx": "#"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "_",
+      "win": "_",
+      "lnx": "_"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "(",
+      "win": "(",
+      "lnx": "("
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "[",
+      "win": "[",
+      "lnx": "["
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "{",
+      "win": "{",
+      "lnx": "{"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "=",
+      "win": "=",
+      "lnx": "="
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "?",
+      "win": "?",
+      "lnx": "?"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "'",
+      "win": "'",
+      "lnx": "'"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "+",
+      "win": "+",
+      "lnx": "+"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "*",
+      "win": "*",
+      "lnx": "*"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "$",
+      "win": "$",
+      "lnx": "$"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "&",
+      "win": "&",
+      "lnx": "&"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     },
+     "hold": {
+      "mac": "^",
+      "win": "^",
+      "lnx": "^"
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": ")",
+      "win": ")",
+      "lnx": ")"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "]",
+      "win": "]",
+      "lnx": "]"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "}",
+      "win": "}",
+      "lnx": "}"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "@",
+      "win": "@",
+      "lnx": "@"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "!",
+      "win": "!",
+      "lnx": "!"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "\"",
+      "win": "\"",
+      "lnx": "\""
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "-",
+      "win": "-",
+      "lnx": "-"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "/",
+      "win": "/",
+      "lnx": "/"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Space",
+      "win": "Ctrl+Space",
+      "lnx": "Ctrl+Space"
+     },
+     "note": {
+      "mac": "Смена языка",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌘ Command",
+      "win": "Win",
+      "lnx": "Super"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "none"
+    }
+   ]
+  },
+  {
+   "index": 2,
+   "node": "sym_2_layer",
+   "name": "SYM_2",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "`",
+      "win": "`",
+      "lnx": "`"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "\\",
+      "win": "\\",
+      "lnx": "\\"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "%",
+      "win": "%",
+      "lnx": "%"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "BT 1",
+      "win": "BT 1",
+      "lnx": "BT 1"
+     },
+     "note": {
+      "mac": "профиль 1",
+      "win": "профиль 1",
+      "lnx": "профиль 1"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "BT 2",
+      "win": "BT 2",
+      "lnx": "BT 2"
+     },
+     "note": {
+      "mac": "профиль 2",
+      "win": "профиль 2",
+      "lnx": "профиль 2"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "BT 3",
+      "win": "BT 3",
+      "lnx": "BT 3"
+     },
+     "note": {
+      "mac": "профиль 3",
+      "win": "профиль 3",
+      "lnx": "профиль 3"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "BT 4",
+      "win": "BT 4",
+      "lnx": "BT 4"
+     },
+     "note": {
+      "mac": "профиль 4",
+      "win": "профиль 4",
+      "lnx": "профиль 4"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "BT 5",
+      "win": "BT 5",
+      "lnx": "BT 5"
+     },
+     "note": {
+      "mac": "профиль 5",
+      "win": "профиль 5",
+      "lnx": "профиль 5"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "~",
+      "win": "~",
+      "lnx": "~"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "|",
+      "win": "|",
+      "lnx": "|"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "^",
+      "win": "^",
+      "lnx": "^"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "Тише 🔉",
+      "win": "Тише 🔉",
+      "lnx": "Тише 🔉"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "Без звука 🔇",
+      "win": "Без звука 🔇",
+      "lnx": "Без звука 🔇"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "Громче 🔊",
+      "win": "Громче 🔊",
+      "lnx": "Громче 🔊"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "out",
+     "label": {
+      "mac": "Вывод USB",
+      "win": "Вывод USB",
+      "lnx": "Вывод USB"
+     },
+     "note": {
+      "mac": "куда идут нажатия",
+      "win": "куда идут нажатия",
+      "lnx": "куда идут нажатия"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "bt",
+     "label": {
+      "mac": "Забыть все BT",
+      "win": "Забыть все BT",
+      "lnx": "Забыть все BT"
+     },
+     "note": {
+      "mac": "стирает все пары",
+      "win": "стирает все пары",
+      "lnx": "стирает все пары"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Z",
+      "win": "Ctrl+Z",
+      "lnx": "Ctrl+Z"
+     },
+     "note": {
+      "mac": null,
+      "win": "Отменить",
+      "lnx": "Отменить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃X",
+      "win": "Ctrl+X",
+      "lnx": "Ctrl+X"
+     },
+     "note": {
+      "mac": null,
+      "win": "Вырезать",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃C",
+      "win": "Ctrl+C",
+      "lnx": "Ctrl+C"
+     },
+     "note": {
+      "mac": null,
+      "win": "Копировать",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘N",
+      "win": "Win+N",
+      "lnx": "Super+N"
+     },
+     "note": {
+      "mac": "Новое окно",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏮",
+      "win": "⏮",
+      "lnx": "⏮"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏯",
+      "win": "⏯",
+      "lnx": "⏯"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏭",
+      "win": "⏭",
+      "lnx": "⏭"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "out",
+     "label": {
+      "mac": "Вывод BLE",
+      "win": "Вывод BLE",
+      "lnx": "Вывод BLE"
+     },
+     "note": {
+      "mac": "куда идут нажатия",
+      "win": "куда идут нажатия",
+      "lnx": "куда идут нажатия"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "danger",
+     "label": {
+      "mac": "Studio",
+      "win": "Studio",
+      "lnx": "Studio"
+     },
+     "note": {
+      "mac": "разблокировать",
+      "win": "разблокировать",
+      "lnx": "разблокировать"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Голосовой ввод",
+      "win": "Голосовой ввод",
+      "lnx": "Голосовой ввод"
+     },
+     "note": {
+      "mac": "⌃⌥⌘Space",
+      "win": "Win+Ctrl+Alt+Space",
+      "lnx": "Super+Ctrl+Alt+Space"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "none"
+    }
+   ]
+  },
+  {
+   "index": 3,
+   "node": "fnc_layer",
+   "name": "FNC",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Esc",
+      "win": "Esc",
+      "lnx": "Esc"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘P",
+      "win": "Win+P",
+      "lnx": "Super+P"
+     },
+     "note": {
+      "mac": "Печать",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⇧⌘3",
+      "win": "Win+Shift+3",
+      "lnx": "Super+Shift+3"
+     },
+     "note": {
+      "mac": "Снимок экрана",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⇧⌘4",
+      "win": "Win+Shift+4",
+      "lnx": "Super+Shift+4"
+     },
+     "note": {
+      "mac": "Снимок области",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘R",
+      "win": "Win+R",
+      "lnx": "Super+R"
+     },
+     "note": {
+      "mac": "Обновить",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘←",
+      "win": "Win+←",
+      "lnx": "Super+←"
+     },
+     "note": {
+      "mac": "Начало строки",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘↓",
+      "win": "Win+↓",
+      "lnx": "Super+↓"
+     },
+     "note": {
+      "mac": "Конец документа",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘↑",
+      "win": "Win+↑",
+      "lnx": "Super+↑"
+     },
+     "note": {
+      "mac": "Начало документа",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘→",
+      "win": "Win+→",
+      "lnx": "Super+→"
+     },
+     "note": {
+      "mac": "Конец строки",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘Q",
+      "win": "Win+Q",
+      "lnx": "Super+Q"
+     },
+     "note": {
+      "mac": "Выйти из программы",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": true,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Tab ⇥",
+      "win": "Tab ⇥",
+      "lnx": "Tab ⇥"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘A",
+      "win": "Win+A",
+      "lnx": "Super+A"
+     },
+     "note": {
+      "mac": "Выделить всё",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘S",
+      "win": "Win+S",
+      "lnx": "Super+S"
+     },
+     "note": {
+      "mac": "Сохранить",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘O",
+      "win": "Win+O",
+      "lnx": "Super+O"
+     },
+     "note": {
+      "mac": "Открыть",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘F",
+      "win": "Win+F",
+      "lnx": "Super+F"
+     },
+     "note": {
+      "mac": "Найти",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "←",
+      "win": "←",
+      "lnx": "←"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "↓",
+      "win": "↓",
+      "lnx": "↓"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "↑",
+      "win": "↑",
+      "lnx": "↑"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "→",
+      "win": "→",
+      "lnx": "→"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌫",
+      "win": "⌫",
+      "lnx": "⌫"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Caps ⇪",
+      "win": "Caps ⇪",
+      "lnx": "Caps ⇪"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘Z",
+      "win": "Win+Z",
+      "lnx": "Super+Z"
+     },
+     "note": {
+      "mac": "Отменить",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘X",
+      "win": "Win+X",
+      "lnx": "Super+X"
+     },
+     "note": {
+      "mac": "Вырезать",
+      "win": null,
+      "lnx": "Вырезать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘C",
+      "win": "Win+C",
+      "lnx": "Super+C"
+     },
+     "note": {
+      "mac": "Копировать",
+      "win": null,
+      "lnx": "Копировать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘V",
+      "win": "Win+V",
+      "lnx": "Super+V"
+     },
+     "note": {
+      "mac": "Вставить",
+      "win": null,
+      "lnx": "Вставить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘Space",
+      "win": "Win+Space",
+      "lnx": "Super+Space"
+     },
+     "note": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌘ Command",
+      "win": "Win",
+      "lnx": "Super"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌃ Control",
+      "win": "Ctrl",
+      "lnx": "Ctrl"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⇧ Shift",
+      "win": "⇧ Shift",
+      "lnx": "⇧ Shift"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Del ⌦",
+      "win": "Del ⌦",
+      "lnx": "Del ⌦"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌫",
+      "win": "⌫",
+      "lnx": "⌫"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⏎",
+      "win": "⏎",
+      "lnx": "⏎"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    }
+   ]
+  },
+  {
+   "index": 4,
+   "node": "fnc_2_layer",
+   "name": "FNC_2",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F1",
+      "win": "F1",
+      "lnx": "F1"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F2",
+      "win": "F2",
+      "lnx": "F2"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F3",
+      "win": "F3",
+      "lnx": "F3"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F4",
+      "win": "F4",
+      "lnx": "F4"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F5",
+      "win": "F5",
+      "lnx": "F5"
+     },
+     "note": {
+      "mac": null,
+      "win": "Обновить",
+      "lnx": "Обновить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F6",
+      "win": "F6",
+      "lnx": "F6"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F7",
+      "win": "F7",
+      "lnx": "F7"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F8",
+      "win": "F8",
+      "lnx": "F8"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F9",
+      "win": "F9",
+      "lnx": "F9"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F10",
+      "win": "F10",
+      "lnx": "F10"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘Q",
+      "win": "Win+Q",
+      "lnx": "Super+Q"
+     },
+     "note": {
+      "mac": "Выйти из программы",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": true,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧S",
+      "win": "Alt+Shift+S",
+      "lnx": "Alt+Shift+S"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧D",
+      "win": "Alt+Shift+D",
+      "lnx": "Alt+Shift+D"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧F",
+      "win": "Alt+Shift+F",
+      "lnx": "Alt+Shift+F"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧I",
+      "win": "Alt+Shift+I",
+      "lnx": "Alt+Shift+I"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧H",
+      "win": "Alt+Shift+H",
+      "lnx": "Alt+Shift+H"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧J",
+      "win": "Alt+Shift+J",
+      "lnx": "Alt+Shift+J"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧K",
+      "win": "Alt+Shift+K",
+      "lnx": "Alt+Shift+K"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥⇧L",
+      "win": "Alt+Shift+L",
+      "lnx": "Alt+Shift+L"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F11",
+      "win": "F11",
+      "lnx": "F11"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F22",
+      "win": "F22",
+      "lnx": "F22"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃⌥⇧H",
+      "win": "Ctrl+Alt+Shift+H",
+      "lnx": "Ctrl+Alt+Shift+H"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃⌥⇧J",
+      "win": "Ctrl+Alt+Shift+J",
+      "lnx": "Ctrl+Alt+Shift+J"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃⌥⇧K",
+      "win": "Ctrl+Alt+Shift+K",
+      "lnx": "Ctrl+Alt+Shift+K"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃⌥⇧L",
+      "win": "Ctrl+Alt+Shift+L",
+      "lnx": "Ctrl+Alt+Shift+L"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘⌫",
+      "win": "Win+⌫",
+      "lnx": "Super+⌫"
+     },
+     "note": {
+      "mac": "Стереть до начала строки",
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "none"
+    },
+    {
+     "t": "none"
+    }
+   ]
+  },
+  {
+   "index": 5,
+   "node": "layer_5",
+   "name": "GAME",
+   "keys": [
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Q",
+      "win": "Q",
+      "lnx": "Q"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "W",
+      "win": "W",
+      "lnx": "W"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "E",
+      "win": "E",
+      "lnx": "E"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "R",
+      "win": "R",
+      "lnx": "R"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "T",
+      "win": "T",
+      "lnx": "T"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "A",
+      "win": "A",
+      "lnx": "A"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "S",
+      "win": "S",
+      "lnx": "S"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "D",
+      "win": "D",
+      "lnx": "D"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F",
+      "win": "F",
+      "lnx": "F"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "G",
+      "win": "G",
+      "lnx": "G"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌃ Control",
+      "win": "Ctrl",
+      "lnx": "Ctrl"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌥ Option",
+      "win": "Alt",
+      "lnx": "Alt"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⇧ Shift",
+      "win": "⇧ Shift",
+      "lnx": "⇧ Shift"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Tab ⇥",
+      "win": "Tab ⇥",
+      "lnx": "Tab ⇥"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Space",
+      "win": "Space",
+      "lnx": "Space"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 6,
+   "node": "win_flag",
+   "name": "WIN",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 7,
+   "node": "lnx_flag",
+   "name": "LNX",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 8,
+   "node": "sym_win_layer",
+   "name": "SYM_W",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "note": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌃ Control",
+      "win": "Ctrl",
+      "lnx": "Ctrl"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 9,
+   "node": "sym_lnx_layer",
+   "name": "SYM_L",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "note": {
+      "mac": "⌃Lshft",
+      "win": "Ctrl+Lshft",
+      "lnx": "Ctrl+Lshft"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌃ Control",
+      "win": "Ctrl",
+      "lnx": "Ctrl"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 10,
+   "node": "sym_2_win_layer",
+   "name": "SYM_2_W",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "Без звука 🔇",
+      "win": "Без звука 🔇",
+      "lnx": "Без звука 🔇"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃N",
+      "win": "Ctrl+N",
+      "lnx": "Ctrl+N"
+     },
+     "note": {
+      "mac": null,
+      "win": "Новое окно",
+      "lnx": "Новое окно"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏮",
+      "win": "⏮",
+      "lnx": "⏮"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏯",
+      "win": "⏯",
+      "lnx": "⏯"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏭",
+      "win": "⏭",
+      "lnx": "⏭"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Голосовой ввод",
+      "win": "Голосовой ввод",
+      "lnx": "Голосовой ввод"
+     },
+     "note": {
+      "mac": "Голосовой ввод",
+      "win": "Голосовой ввод",
+      "lnx": "Голосовой ввод"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 11,
+   "node": "sym_2_lnx_layer",
+   "name": "SYM_2_L",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "Без звука 🔇",
+      "win": "Без звука 🔇",
+      "lnx": "Без звука 🔇"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃N",
+      "win": "Ctrl+N",
+      "lnx": "Ctrl+N"
+     },
+     "note": {
+      "mac": null,
+      "win": "Новое окно",
+      "lnx": "Новое окно"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏮",
+      "win": "⏮",
+      "lnx": "⏮"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏯",
+      "win": "⏯",
+      "lnx": "⏯"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "media",
+     "label": {
+      "mac": "⏭",
+      "win": "⏭",
+      "lnx": "⏭"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Голосовой ввод",
+      "win": "Голосовой ввод",
+      "lnx": "Голосовой ввод"
+     },
+     "note": {
+      "mac": "⌃⌘X",
+      "win": "Win+Ctrl+X",
+      "lnx": "Super+Ctrl+X"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 12,
+   "node": "fnc_win_layer",
+   "name": "FNC_W",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃P",
+      "win": "Ctrl+P",
+      "lnx": "Ctrl+P"
+     },
+     "note": {
+      "mac": null,
+      "win": "Печать",
+      "lnx": "Печать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Снимок экрана",
+      "win": "Снимок экрана",
+      "lnx": "Снимок экрана"
+     },
+     "note": {
+      "mac": "⌘PrtSc",
+      "win": "Win+PrtSc",
+      "lnx": "Super+PrtSc"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Снимок области",
+      "win": "Снимок области",
+      "lnx": "Снимок области"
+     },
+     "note": {
+      "mac": "⇧⌘S",
+      "win": "Win+Shift+S",
+      "lnx": "Super+Shift+S"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F5",
+      "win": "F5",
+      "lnx": "F5"
+     },
+     "note": {
+      "mac": null,
+      "win": "Обновить",
+      "lnx": "Обновить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Home",
+      "win": "Home",
+      "lnx": "Home"
+     },
+     "note": {
+      "mac": null,
+      "win": "Начало строки",
+      "lnx": "Начало строки"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃End",
+      "win": "Ctrl+End",
+      "lnx": "Ctrl+End"
+     },
+     "note": {
+      "mac": null,
+      "win": "Конец документа",
+      "lnx": "Конец документа"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Home",
+      "win": "Ctrl+Home",
+      "lnx": "Ctrl+Home"
+     },
+     "note": {
+      "mac": null,
+      "win": "Начало документа",
+      "lnx": "Начало документа"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "End",
+      "win": "End",
+      "lnx": "End"
+     },
+     "note": {
+      "mac": null,
+      "win": "Конец строки",
+      "lnx": "Конец строки"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Закрыть окно",
+      "win": "Закрыть окно",
+      "lnx": "Закрыть окно"
+     },
+     "note": {
+      "mac": "⌥F4",
+      "win": "Alt+F4",
+      "lnx": "Alt+F4"
+     },
+     "danger": {
+      "mac": true,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃A",
+      "win": "Ctrl+A",
+      "lnx": "Ctrl+A"
+     },
+     "note": {
+      "mac": null,
+      "win": "Выделить всё",
+      "lnx": "Выделить всё"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃S",
+      "win": "Ctrl+S",
+      "lnx": "Ctrl+S"
+     },
+     "note": {
+      "mac": null,
+      "win": "Сохранить",
+      "lnx": "Сохранить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃O",
+      "win": "Ctrl+O",
+      "lnx": "Ctrl+O"
+     },
+     "note": {
+      "mac": null,
+      "win": "Открыть",
+      "lnx": "Открыть"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃F",
+      "win": "Ctrl+F",
+      "lnx": "Ctrl+F"
+     },
+     "note": {
+      "mac": null,
+      "win": "Найти",
+      "lnx": "Найти"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Z",
+      "win": "Ctrl+Z",
+      "lnx": "Ctrl+Z"
+     },
+     "note": {
+      "mac": null,
+      "win": "Отменить",
+      "lnx": "Отменить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃X",
+      "win": "Ctrl+X",
+      "lnx": "Ctrl+X"
+     },
+     "note": {
+      "mac": null,
+      "win": "Вырезать",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃C",
+      "win": "Ctrl+C",
+      "lnx": "Ctrl+C"
+     },
+     "note": {
+      "mac": null,
+      "win": "Копировать",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃V",
+      "win": "Ctrl+V",
+      "lnx": "Ctrl+V"
+     },
+     "note": {
+      "mac": null,
+      "win": "Вставить",
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "note": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌥ Option",
+      "win": "Alt",
+      "lnx": "Alt"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 13,
+   "node": "fnc_lnx_layer",
+   "name": "FNC_L",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃P",
+      "win": "Ctrl+P",
+      "lnx": "Ctrl+P"
+     },
+     "note": {
+      "mac": null,
+      "win": "Печать",
+      "lnx": "Печать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃⌘C",
+      "win": "Win+Ctrl+C",
+      "lnx": "Super+Ctrl+C"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": "Меню снимка экрана"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "PrtSc",
+      "win": "PrtSc",
+      "lnx": "PrtSc"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": "Снимок области"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "F5",
+      "win": "F5",
+      "lnx": "F5"
+     },
+     "note": {
+      "mac": null,
+      "win": "Обновить",
+      "lnx": "Обновить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "Home",
+      "win": "Home",
+      "lnx": "Home"
+     },
+     "note": {
+      "mac": null,
+      "win": "Начало строки",
+      "lnx": "Начало строки"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃End",
+      "win": "Ctrl+End",
+      "lnx": "Ctrl+End"
+     },
+     "note": {
+      "mac": null,
+      "win": "Конец документа",
+      "lnx": "Конец документа"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Home",
+      "win": "Ctrl+Home",
+      "lnx": "Ctrl+Home"
+     },
+     "note": {
+      "mac": null,
+      "win": "Начало документа",
+      "lnx": "Начало документа"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "End",
+      "win": "End",
+      "lnx": "End"
+     },
+     "note": {
+      "mac": null,
+      "win": "Конец строки",
+      "lnx": "Конец строки"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘W",
+      "win": "Win+W",
+      "lnx": "Super+W"
+     },
+     "note": {
+      "mac": "Закрыть окно",
+      "win": null,
+      "lnx": "Закрыть окно"
+     },
+     "danger": {
+      "mac": true,
+      "win": false,
+      "lnx": true
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Предыдущее окно",
+      "win": "Предыдущее окно",
+      "lnx": "Предыдущее окно"
+     },
+     "note": {
+      "mac": "⌥Tab ⇥",
+      "win": "Alt+Tab ⇥",
+      "lnx": "Alt+Tab ⇥"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃A",
+      "win": "Ctrl+A",
+      "lnx": "Ctrl+A"
+     },
+     "note": {
+      "mac": null,
+      "win": "Выделить всё",
+      "lnx": "Выделить всё"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃S",
+      "win": "Ctrl+S",
+      "lnx": "Ctrl+S"
+     },
+     "note": {
+      "mac": null,
+      "win": "Сохранить",
+      "lnx": "Сохранить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃O",
+      "win": "Ctrl+O",
+      "lnx": "Ctrl+O"
+     },
+     "note": {
+      "mac": null,
+      "win": "Открыть",
+      "lnx": "Открыть"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃F",
+      "win": "Ctrl+F",
+      "lnx": "Ctrl+F"
+     },
+     "note": {
+      "mac": null,
+      "win": "Найти",
+      "lnx": "Найти"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌃Z",
+      "win": "Ctrl+Z",
+      "lnx": "Ctrl+Z"
+     },
+     "note": {
+      "mac": null,
+      "win": "Отменить",
+      "lnx": "Отменить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘X",
+      "win": "Win+X",
+      "lnx": "Super+X"
+     },
+     "note": {
+      "mac": "Вырезать",
+      "win": null,
+      "lnx": "Вырезать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘C",
+      "win": "Win+C",
+      "lnx": "Super+C"
+     },
+     "note": {
+      "mac": "Копировать",
+      "win": null,
+      "lnx": "Копировать"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘V",
+      "win": "Win+V",
+      "lnx": "Super+V"
+     },
+     "note": {
+      "mac": "Вставить",
+      "win": null,
+      "lnx": "Вставить"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Смена языка",
+      "win": "Смена языка",
+      "lnx": "Смена языка"
+     },
+     "note": {
+      "mac": "⌃Lshft",
+      "win": "Ctrl+Lshft",
+      "lnx": "Ctrl+Lshft"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "key",
+     "kind": "mod",
+     "label": {
+      "mac": "⌥ Option",
+      "win": "Alt",
+      "lnx": "Alt"
+     },
+     "note": {
+      "mac": null,
+      "win": null,
+      "lnx": null
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 14,
+   "node": "fnc_2_win_layer",
+   "name": "FNC_2_W",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌥F4",
+      "win": "Alt+F4",
+      "lnx": "Alt+F4"
+     },
+     "note": {
+      "mac": null,
+      "win": "Закрыть окно",
+      "lnx": "Закрыть окно"
+     },
+     "danger": {
+      "mac": false,
+      "win": true,
+      "lnx": true
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Стереть до начала строки",
+      "win": "Стереть до начала строки",
+      "lnx": "Стереть до начала строки"
+     },
+     "note": {
+      "mac": "⇧Home, ⌫",
+      "win": "Shift+Home, ⌫",
+      "lnx": "Shift+Home, ⌫"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  },
+  {
+   "index": 15,
+   "node": "fnc_2_lnx_layer",
+   "name": "FNC_2_L",
+   "keys": [
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "key",
+     "label": {
+      "mac": "⌘W",
+      "win": "Win+W",
+      "lnx": "Super+W"
+     },
+     "note": {
+      "mac": "Закрыть окно",
+      "win": null,
+      "lnx": "Закрыть окно"
+     },
+     "danger": {
+      "mac": true,
+      "win": false,
+      "lnx": true
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "key",
+     "kind": "action",
+     "label": {
+      "mac": "Стереть до начала строки",
+      "win": "Стереть до начала строки",
+      "lnx": "Стереть до начала строки"
+     },
+     "note": {
+      "mac": "⇧Home, ⌫",
+      "win": "Shift+Home, ⌫",
+      "lnx": "Shift+Home, ⌫"
+     },
+     "danger": {
+      "mac": false,
+      "win": false,
+      "lnx": false
+     }
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    },
+    {
+     "t": "trans"
+    }
+   ]
+  }
+ ],
+ "conditional": [
+  {
+   "if": [
+    1,
+    6
+   ],
+   "then": 8
+  },
+  {
+   "if": [
+    1,
+    7
+   ],
+   "then": 9
+  },
+  {
+   "if": [
+    2,
+    6
+   ],
+   "then": 10
+  },
+  {
+   "if": [
+    2,
+    7
+   ],
+   "then": 11
+  },
+  {
+   "if": [
+    3,
+    6
+   ],
+   "then": 12
+  },
+  {
+   "if": [
+    3,
+    7
+   ],
+   "then": 13
+  },
+  {
+   "if": [
+    4,
+    6
+   ],
+   "then": 14
+  },
+  {
+   "if": [
+    4,
+    7
+   ],
+   "then": 15
+  }
+ ],
+ "combos": [
+  {
+   "node": "combo_sym2",
+   "positions": [
+    32,
+    33
+   ],
+   "binding": {
+    "t": "key",
+    "kind": "layer",
+    "layer": 2,
+    "label": {
+     "mac": "SYM_2",
+     "win": "SYM_2",
+     "lnx": "SYM_2"
+    },
+    "note": {
+     "mac": "вкл/выкл",
+     "win": "вкл/выкл",
+     "lnx": "вкл/выкл"
+    },
+    "danger": {
+     "mac": false,
+     "win": false,
+     "lnx": false
+    }
+   },
+   "layers": []
+  },
+  {
+   "node": "combo_fun2",
+   "positions": [
+    30,
+    31
+   ],
+   "binding": {
+    "t": "key",
+    "kind": "layer",
+    "layer": 4,
+    "label": {
+     "mac": "FNC_2",
+     "win": "FNC_2",
+     "lnx": "FNC_2"
+    },
+    "note": {
+     "mac": "вкл/выкл",
+     "win": "вкл/выкл",
+     "lnx": "вкл/выкл"
+    },
+    "danger": {
+     "mac": false,
+     "win": false,
+     "lnx": false
+    }
+   },
+   "layers": []
+  },
+  {
+   "node": "combo_os_mac",
+   "positions": [
+    3,
+    4
+   ],
+   "binding": {
+    "t": "key",
+    "kind": "layer",
+    "layer": 0,
+    "label": {
+     "mac": "BASE",
+     "win": "BASE",
+     "lnx": "BASE"
+    },
+    "note": {
+     "mac": "перейти",
+     "win": "перейти",
+     "lnx": "перейти"
+    },
+    "danger": {
+     "mac": false,
+     "win": false,
+     "lnx": false
+    }
+   },
+   "layers": [
+    2,
+    10,
+    11
+   ]
+  },
+  {
+   "node": "combo_os_win",
+   "positions": [
+    13,
+    14
+   ],
+   "binding": {
+    "t": "key",
+    "kind": "layer",
+    "layer": 6,
+    "label": {
+     "mac": "WIN",
+     "win": "WIN",
+     "lnx": "WIN"
+    },
+    "note": {
+     "mac": "перейти",
+     "win": "перейти",
+     "lnx": "перейти"
+    },
+    "danger": {
+     "mac": false,
+     "win": false,
+     "lnx": false
+    }
+   },
+   "layers": [
+    2,
+    10,
+    11
+   ]
+  },
+  {
+   "node": "combo_os_lnx",
+   "positions": [
+    23,
+    24
+   ],
+   "binding": {
+    "t": "key",
+    "kind": "layer",
+    "layer": 7,
+    "label": {
+     "mac": "LNX",
+     "win": "LNX",
+     "lnx": "LNX"
+    },
+    "note": {
+     "mac": "перейти",
+     "win": "перейти",
+     "lnx": "перейти"
+    },
+    "danger": {
+     "mac": false,
+     "win": false,
+     "lnx": false
+    }
+   },
+   "layers": [
+    2,
+    10,
+    11
+   ]
+  }
+ ],
+ "hints": [
+  {
+   "layer": 1,
+   "text": "SYM — удерживать правый внешний большой"
+  },
+  {
+   "layer": 2,
+   "text": "SYM_2 — оба правых больших вместе (вкл/выкл)"
+  },
+  {
+   "layer": 3,
+   "text": "FNC — удерживать левый внешний большой"
+  },
+  {
+   "layer": 4,
+   "text": "FNC_2 — оба левых больших вместе (вкл/выкл)"
+  },
+  {
+   "layer": -1,
+   "text": "Режим ОС на SYM_2: R+T Мак, F+G Windows, V+B Linux"
+  }
+ ]
+}

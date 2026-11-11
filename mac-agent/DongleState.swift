@@ -22,6 +22,10 @@ struct DongleState {
     /// Показывается в меню, чтобы расхождение с панелью можно было увидеть.
     var leftSlot: UInt8?
 
+    /// Маска активных слоёв (бит N — слой N в порядке cradio.keymap), с
+    /// третьей версии прошивки; nil — донгл её не отдаёт.
+    var layerState: UInt32?
+
     var isUSB: Bool { btFlags & 0b100 != 0 }
     var isConnected: Bool { btFlags & 0b001 != 0 }
     var isOpen: Bool { btFlags & 0b010 != 0 }
@@ -38,13 +42,29 @@ struct DongleState {
 
         // Поле появилось во второй версии — у первой его просто нет.
         leftSlot = (data.count >= 8 && data[7] != 0xFF) ? data[7] : nil
+
+        // Третья версия: маска слоёв, little-endian.
+        if data[0] >= 3, data.count >= 12 {
+            layerState = (0..<4).reduce(UInt32(0)) { acc, i in
+                acc | UInt32(data[8 + i]) << (8 * UInt32(i))
+            }
+        }
     }
 
-    /// Имена слоёв держатся синхронно с config/cradio.keymap.
-    static let layerNames = ["BASE", "SYM", "SYM2", "FN", "FN2"]
-
+    /// Имя берётся из keymap.json, который сгенерирован из cradio.keymap.
     var layerName: String {
-        Int(layer) < Self.layerNames.count ? Self.layerNames[Int(layer)] : "L\(layer)"
+        guard let keymap = Keymap.current else { return "L\(layer)" }
+
+        guard let mask = layerState else { return keymap.layerName(Int(layer)) }
+
+        let full = keymap.applyingConditional(mask)
+        return keymap.layerName(keymap.topWorkingLayer(in: full))
+    }
+
+    /// Режим ОС по флаг-слою; nil — прошивка маску не отдаёт.
+    var osMode: OSMode? {
+        guard let mask = layerState, let keymap = Keymap.current else { return nil }
+        return keymap.mode(for: mask)
     }
 
     var outputDescription: String {

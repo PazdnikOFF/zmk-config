@@ -15,6 +15,15 @@ APP="SweepDongleAgent.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 cp Info.plist "$APP/Contents/Info.plist"
+
+# Подписи окна подсказок. keymap.json генерируется на GMKtec из
+# config/cradio.keymap (make-keymap.sh) — здесь только кладём его в бандл.
+if [[ ! -f keymap.json ]]; then
+  echo "нет keymap.json: сначала ./make-keymap.sh на GMKtec" >&2
+  exit 1
+fi
+mkdir -p "$APP/Contents/Resources"
+cp keymap.json "$APP/Contents/Resources/keymap.json"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
 # -target обязателен. По умолчанию тулчейн ставит в Mach-O minos 28.0 — выше,

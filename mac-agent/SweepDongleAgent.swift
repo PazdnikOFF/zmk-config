@@ -341,6 +341,33 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     /// Последний вычитанный слепок — из него строится меню, без похода в эфир.
     private(set) var lastState: DongleState?
 
+    /*
+     * Уведомления о смене слоя — только пока открыто окно подсказок. Донгл
+     * шлёт их лишь подписчикам, так что без окна в эфире ничего не меняется.
+     */
+    var wantsLayerNotifications = false {
+        didSet { applyLayerNotifications() }
+    }
+
+    /// Подписка на уведомления реально включена на донгле.
+    private(set) var layerNotificationsLive = false
+
+    private func applyLayerNotifications() {
+        guard let dongle, let stateChar, stateChar.properties.contains(.notify) else { return }
+
+        if stateChar.isNotifying != wantsLayerNotifications {
+            dongle.setNotifyValue(wantsLayerNotifications, for: stateChar)
+        }
+        if wantsLayerNotifications {
+            dongle.readValue(for: stateChar)  // сразу показать текущий слой
+        }
+    }
+
+    private func pushState() {
+        menuBar?.update(
+            state: lastState, linkUp: isConnected, notificationsLive: layerNotificationsLive)
+    }
+
     override init() {
         super.init()
         central = CBCentralManager(delegate: self, queue: nil)
@@ -408,6 +435,8 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         } else {
             dongle = nil
             metrics = nil
+            stateChar = nil
+            layerNotificationsLive = false
         }
     }
 
@@ -440,6 +469,8 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         log("BLE: соединение потеряно")
         dongle = nil
         metrics = nil
+        stateChar = nil
+        layerNotificationsLive = false
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -458,7 +489,22 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         guard characteristic.uuid == kStateUUID, let data = characteristic.value else { return }
 
         lastState = DongleState(data)
-        menuBar?.update(state: lastState, linkUp: isConnected)
+        pushState()
+    }
+
+    func peripheral(
+        _ peripheral: CBPeripheral,
+        didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?
+    ) {
+        guard characteristic.uuid == kStateUUID else { return }
+
+        layerNotificationsLive = characteristic.isNotifying
+        if let error {
+            log("BLE: подписка на слой не удалась — \(error.localizedDescription)")
+        } else {
+            log("BLE: уведомления о слое \(characteristic.isNotifying ? "включены" : "выключены")")
+        }
+        pushState()
     }
 
     func peripheral(
@@ -479,6 +525,7 @@ final class BluetoothLink: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         log(metrics != nil ? "BLE: канал готов" : "BLE: характеристика не найдена")
 
         readState()
+        applyLayerNotifications()
     }
 }
 
@@ -524,7 +571,9 @@ func tick() {
         bluetooth.readState()
     }
 
-    menuBar?.update(state: bluetooth.lastState, linkUp: bluetooth.isConnected)
+    menuBar?.update(
+        state: bluetooth.lastState, linkUp: bluetooth.isConnected,
+        notificationsLive: bluetooth.layerNotificationsLive)
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -532,6 +581,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBar = MenuBarController()
+        menuBar?.hints.onVisibilityChange = { visible in
+            bluetooth.wantsLayerNotifications = visible
+        }
+        bluetooth.wantsLayerNotifications = menuBar?.hints.isVisible ?? false
+        menuBar?.hints.restore()
         FirstRun.askIfNeeded()
 
         // Первая выборка CPU задаёт базу для дельты и смысла не несёт.

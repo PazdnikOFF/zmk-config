@@ -16,6 +16,7 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/byteorder.h>
 
 #include <lvgl.h>
 
@@ -593,6 +594,7 @@ void dongle_ui_fill_state(struct dongle_public_state *out) {
     out->batt_right = (right < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)right;
     out->batt_dongle = (kbd.self_batt < 0) ? DONGLE_BATT_UNKNOWN : (uint8_t)kbd.self_batt;
     out->left_slot = (kbd.left_slot < 0) ? 0xFF : (uint8_t)kbd.left_slot;
+    out->layer_state = sys_cpu_to_le32((uint32_t)zmk_keymap_layer_state());
 
     const struct zmk_endpoint_instance endpoint = zmk_endpoint_get_selected();
 

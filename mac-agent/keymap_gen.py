@@ -80,6 +80,42 @@ SHIFTED = {
     "\\": "|", ";": ":", "'": "\"", "`": "~", ",": "<", ".": ">", "/": "?",
 }
 
+# Физическая клавиша US и Shift для печатных кодов: по ним агент на маке
+# спрашивает текущую раскладку, что именно напечатается (Q -> Й, # -> №).
+SHIFTED_ALIASES = {
+    "EXCL": "N1", "AT": "N2", "HASH": "N3", "POUND": "N3", "DLLR": "N4", "DOLLAR": "N4",
+    "PRCNT": "N5", "PERCENT": "N5", "CARET": "N6", "AMPS": "N7", "STAR": "N8",
+    "ASTRK": "N8", "LPAR": "N9", "RPAR": "N0", "UNDER": "MINUS", "UNDERSCORE": "MINUS",
+    "PLUS": "EQUAL", "LBRC": "LBKT", "RBRC": "RBKT", "PIPE": "BSLH", "COLON": "SEMI",
+    "DQT": "SQT", "TILDE": "GRAVE", "LT": "COMMA", "GT": "DOT", "QMARK": "SLASH",
+}
+
+PHYSICAL_ALIASES = {
+    "SEMICOLON": "SEMI", "APOS": "SQT", "BACKSLASH": "BSLH", "FSLH": "SLASH",
+    "PERIOD": "DOT", "UNDERSCORE": "MINUS",
+}
+
+PHYSICAL_KEYS = {
+    "MINUS", "EQUAL", "LBKT", "RBKT", "BSLH", "SEMI", "SQT", "GRAVE", "COMMA", "DOT", "SLASH",
+}
+
+
+def printable_code(mods, key):
+    """{"key": "N3", "shift": true} для печатной клавиши без ⌘/⌃/⌥, иначе None."""
+    if mods - {"S"}:
+        return None
+    shift = "S" in mods
+    if key in SHIFTED_ALIASES:
+        return {"key": SHIFTED_ALIASES[key], "shift": True}
+    key = PHYSICAL_ALIASES.get(key, key)
+    m = re.fullmatch(r"(?:NUMBER_|N)(\d)", key)
+    if m:
+        return {"key": "N" + m.group(1), "shift": shift}
+    if re.fullmatch(r"[A-Z]", key) or key in PHYSICAL_KEYS:
+        return {"key": key, "shift": shift}
+    return None
+
+
 # Клавиши-модификаторы сами по себе. C — Ctrl, A — Alt, S — Shift, G — Gui.
 MOD_KEYS = {
     "LCTRL": "C", "LEFT_CONTROL": "C", "LCTL": "C", "RCTRL": "C", "RIGHT_CONTROL": "C",
@@ -368,7 +404,11 @@ class Labeler:
             note[mode] = n
             danger[mode] = d
         kind = "media" if key in MEDIA_KEYS else ("mod" if key in MOD_KEYS and not mods else "key")
-        return {"t": "key", "kind": kind, "label": label, "note": note, "danger": danger}
+        result = {"t": "key", "kind": kind, "label": label, "note": note, "danger": danger}
+        code = printable_code(mods, key)
+        if code:
+            result["code"] = code
+        return result
 
     def binding(self, name, params, origin):
         if name == "trans":
@@ -419,6 +459,8 @@ class Labeler:
             tap = self.kp(params[1])
             hold = self.kp(params[0])
             tap["hold"] = hold["label"]
+            if "code" in hold:
+                tap["holdCode"] = hold["code"]
             return tap
 
         if name == "bt":

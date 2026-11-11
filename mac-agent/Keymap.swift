@@ -36,6 +36,12 @@ struct PerMode<Value: Decodable>: Decodable {
     }
 }
 
+/// Физическая клавиша US и Shift — для перевода в текущую раскладку macOS.
+struct KeyCode: Decodable {
+    let key: String
+    let shift: Bool
+}
+
 struct KeyBinding: Decodable {
     /// "key", "trans" (прозрачная — берётся с нижнего слоя) или "none".
     let t: String
@@ -46,6 +52,9 @@ struct KeyBinding: Decodable {
     let hold: PerMode<String>?
     let danger: PerMode<Bool>?
     let layer: Int?
+    /// Есть у печатных клавиш: что нажимается физически.
+    let code: KeyCode?
+    let holdCode: KeyCode?
 
     var isTransparent: Bool { t == "trans" }
     var isNone: Bool { t == "none" }
@@ -265,7 +274,7 @@ struct Keymap: Decodable {
             return ResolvedKey(
                 binding: KeyBinding(
                     t: "none", kind: nil, label: nil, note: nil, hold: nil, danger: nil,
-                    layer: nil),
+                    layer: nil, code: nil, holdCode: nil),
                 sourceLayer: 0, fromBelow: false, fromOverlay: false)
         }
     }

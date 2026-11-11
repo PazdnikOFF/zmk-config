@@ -28,6 +28,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "Q",
+      "shift": false
      }
     },
     {
@@ -47,6 +51,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "W",
+      "shift": false
      }
     },
     {
@@ -66,6 +74,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "E",
+      "shift": false
      }
     },
     {
@@ -85,6 +97,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "R",
+      "shift": false
      }
     },
     {
@@ -104,6 +120,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "T",
+      "shift": false
      }
     },
     {
@@ -123,6 +143,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "Y",
+      "shift": false
      }
     },
     {
@@ -142,6 +166,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "U",
+      "shift": false
      }
     },
     {
@@ -161,6 +189,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "I",
+      "shift": false
      }
     },
     {
@@ -180,6 +212,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "O",
+      "shift": false
      }
     },
     {
@@ -200,10 +236,18 @@
       "win": false,
       "lnx": false
      },
+     "code": {
+      "key": "P",
+      "shift": false
+     },
      "hold": {
       "mac": "[",
       "win": "[",
       "lnx": "["
+     },
+     "holdCode": {
+      "key": "LBKT",
+      "shift": false
      }
     },
     {
@@ -223,6 +267,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "A",
+      "shift": false
      }
     },
     {
@@ -242,6 +290,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "S",
+      "shift": false
      }
     },
     {
@@ -261,6 +313,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "D",
+      "shift": false
      }
     },
     {
@@ -280,6 +336,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "F",
+      "shift": false
      }
     },
     {
@@ -299,6 +359,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "G",
+      "shift": false
      }
     },
     {
@@ -318,6 +382,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "H",
+      "shift": false
      }
     },
     {
@@ -337,6 +405,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "J",
+      "shift": false
      }
     },
     {
@@ -356,6 +428,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "K",
+      "shift": false
      }
     },
     {
@@ -375,6 +451,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "L",
+      "shift": false
      }
     },
     {
@@ -395,10 +475,18 @@
       "win": false,
       "lnx": false
      },
+     "code": {
+      "key": "SEMI",
+      "shift": false
+     },
      "hold": {
       "mac": "'",
       "win": "'",
       "lnx": "'"
+     },
+     "holdCode": {
+      "key": "SQT",
+      "shift": false
      }
     },
     {
@@ -418,6 +506,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "Z",
+      "shift": false
      }
     },
     {
@@ -437,6 +529,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "X",
+      "shift": false
      }
     },
     {
@@ -456,6 +552,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "C",
+      "shift": false
      }
     },
     {
@@ -475,6 +575,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "V",
+      "shift": false
      }
     },
     {
@@ -494,6 +598,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "B",
+      "shift": false
      }
     },
     {
@@ -513,6 +621,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N",
+      "shift": false
      }
     },
     {
@@ -533,10 +645,18 @@
       "win": false,
       "lnx": false
      },
+     "code": {
+      "key": "M",
+      "shift": false
+     },
      "hold": {
       "mac": "]",
       "win": "]",
       "lnx": "]"
+     },
+     "holdCode": {
+      "key": "RBKT",
+      "shift": false
      }
     },
     {
@@ -556,6 +676,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "COMMA",
+      "shift": false
      }
     },
     {
@@ -575,6 +699,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "DOT",
+      "shift": false
      }
     },
     {
@@ -595,10 +723,18 @@
       "win": false,
       "lnx": false
      },
+     "code": {
+      "key": "SLASH",
+      "shift": false
+     },
      "hold": {
       "mac": "\\",
       "win": "\\",
       "lnx": "\\"
+     },
+     "holdCode": {
+      "key": "BSLH",
+      "shift": false
      }
     },
     {
@@ -703,6 +839,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N1",
+      "shift": false
      }
     },
     {
@@ -722,6 +862,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N2",
+      "shift": false
      }
     },
     {
@@ -741,6 +885,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N3",
+      "shift": false
      }
     },
     {
@@ -760,6 +908,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N4",
+      "shift": false
      }
     },
     {
@@ -779,6 +931,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N5",
+      "shift": false
      }
     },
     {
@@ -798,6 +954,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N6",
+      "shift": false
      }
     },
     {
@@ -817,6 +977,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N7",
+      "shift": false
      }
     },
     {
@@ -836,6 +1000,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N8",
+      "shift": false
      }
     },
     {
@@ -855,6 +1023,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N9",
+      "shift": false
      }
     },
     {
@@ -874,6 +1046,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N0",
+      "shift": false
      }
     },
     {
@@ -893,6 +1069,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N3",
+      "shift": true
      }
     },
     {
@@ -912,6 +1092,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "MINUS",
+      "shift": true
      }
     },
     {
@@ -931,6 +1115,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N9",
+      "shift": true
      }
     },
     {
@@ -950,6 +1138,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "LBKT",
+      "shift": false
      }
     },
     {
@@ -969,6 +1161,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "LBKT",
+      "shift": true
      }
     },
     {
@@ -988,6 +1184,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "EQUAL",
+      "shift": false
      }
     },
     {
@@ -1007,6 +1207,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "SLASH",
+      "shift": true
      }
     },
     {
@@ -1026,6 +1230,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "SQT",
+      "shift": false
      }
     },
     {
@@ -1045,6 +1253,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "EQUAL",
+      "shift": true
      }
     },
     {
@@ -1064,6 +1276,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N8",
+      "shift": true
      }
     },
     {
@@ -1083,6 +1299,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N4",
+      "shift": true
      }
     },
     {
@@ -1103,10 +1323,18 @@
       "win": false,
       "lnx": false
      },
+     "code": {
+      "key": "N7",
+      "shift": true
+     },
      "hold": {
       "mac": "^",
       "win": "^",
       "lnx": "^"
+     },
+     "holdCode": {
+      "key": "N6",
+      "shift": true
      }
     },
     {
@@ -1126,6 +1354,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N0",
+      "shift": true
      }
     },
     {
@@ -1145,6 +1377,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "RBKT",
+      "shift": false
      }
     },
     {
@@ -1164,6 +1400,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "RBKT",
+      "shift": true
      }
     },
     {
@@ -1183,6 +1423,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N2",
+      "shift": true
      }
     },
     {
@@ -1202,6 +1446,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N1",
+      "shift": true
      }
     },
     {
@@ -1221,6 +1469,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "SQT",
+      "shift": true
      }
     },
     {
@@ -1240,6 +1492,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "MINUS",
+      "shift": false
      }
     },
     {
@@ -1259,6 +1515,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "SLASH",
+      "shift": false
      }
     },
     {
@@ -1329,6 +1589,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "GRAVE",
+      "shift": false
      }
     },
     {
@@ -1348,6 +1612,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "BSLH",
+      "shift": false
      }
     },
     {
@@ -1367,6 +1635,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N5",
+      "shift": true
      }
     },
     {
@@ -1487,6 +1759,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "GRAVE",
+      "shift": true
      }
     },
     {
@@ -1506,6 +1782,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "BSLH",
+      "shift": true
      }
     },
     {
@@ -1525,6 +1805,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "N6",
+      "shift": true
      }
     },
     {
@@ -3000,6 +3284,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "Q",
+      "shift": false
      }
     },
     {
@@ -3019,6 +3307,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "W",
+      "shift": false
      }
     },
     {
@@ -3038,6 +3330,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "E",
+      "shift": false
      }
     },
     {
@@ -3057,6 +3353,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "R",
+      "shift": false
      }
     },
     {
@@ -3076,6 +3376,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "T",
+      "shift": false
      }
     },
     {
@@ -3110,6 +3414,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "A",
+      "shift": false
      }
     },
     {
@@ -3129,6 +3437,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "S",
+      "shift": false
      }
     },
     {
@@ -3148,6 +3460,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "D",
+      "shift": false
      }
     },
     {
@@ -3167,6 +3483,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "F",
+      "shift": false
      }
     },
     {
@@ -3186,6 +3506,10 @@
       "mac": false,
       "win": false,
       "lnx": false
+     },
+     "code": {
+      "key": "G",
+      "shift": false
      }
     },
     {

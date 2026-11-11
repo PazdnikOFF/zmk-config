@@ -118,6 +118,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         panel.alphaValue = 0.92
         panel.isReleasedWhenClosed = false
         panel.delegate = self
+        InputLayout.shared.onChange = { [weak self] in self?.refresh() }
         panel.title = "Раскладка Sweep"
 
         modeControl.segmentCount = OSMode.allCases.count + 1
@@ -218,6 +219,7 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
             ? liveMask! : keymap.mask(layer: layer, mode: mode)
 
         let top = keymap.topWorkingLayer(in: mask)
+        keyboard.layout = InputLayout.shared
         keyboard.keymap = keymap
         keyboard.topLayer = top
         keyboard.mode = mode
@@ -229,7 +231,9 @@ final class LayerHintsController: NSObject, NSWindowDelegate {
         legend.toolTip = keymap.hints.map { "• " + $0.text }.joined(separator: "\n")
 
         let manual = manualMode != nil || manualLayer != nil
-        panel.title = "\(keymap.layerName(layer)) · \(mode.title)\(manual ? " (вручную)" : "")"
+        let language = mode == .mac ? " · \(InputLayout.shared.language)" : ""
+        panel.title =
+            "\(keymap.layerName(layer)) · \(mode.title)\(language)\(manual ? " (вручную)" : "")"
 
         statusLabel.stringValue = statusText(manual: manual)
     }
@@ -273,6 +277,8 @@ final class KeyboardView: NSView {
     var keys: [ResolvedKey] = [] { didSet { needsDisplay = true } }
     var mode: OSMode = .mac { didSet { needsDisplay = true } }
     var keymap: Keymap? { didSet { needsDisplay = true } }
+    /// Раскладка macOS для печатных клавиш; используется только в режиме Мак.
+    var layout: InputLayout? { didSet { needsDisplay = true } }
     /// Верхний рабочий слой: от него зависит, какие комбо подписывать.
     var topLayer = 0 { didSet { needsDisplay = true } }
 
@@ -407,7 +413,9 @@ final class KeyboardView: NSView {
                 .fill()
         }
 
-        guard !binding.isNone, let label = binding.label?[mode] else { return }
+        guard !binding.isNone, let label = text(binding.code, fallback: binding.label?[mode]) else {
+            return
+        }
 
         let primary: NSColor = key.fromBelow ? .tertiaryLabelColor : .labelColor
         let secondary: NSColor = key.fromBelow ? .quaternaryLabelColor : .secondaryLabelColor
@@ -417,7 +425,7 @@ final class KeyboardView: NSView {
         // Действие при удержании — жёлтым вверху справа, заметно, но не
         // крупнее основного.
         var top: CGFloat = 8
-        if let hold = binding.hold?[mode] {
+        if let hold = text(binding.holdCode, fallback: binding.hold?[mode]) {
             let color = key.fromBelow ? NSColor.systemYellow.withAlphaComponent(0.45) : .systemYellow
             drawBold(
                 hold, in: NSRect(x: inner.minX, y: inner.minY - 1, width: inner.width, height: 14),
@@ -437,6 +445,15 @@ final class KeyboardView: NSView {
                 in: NSRect(x: inner.minX, y: inner.maxY - 11, width: inner.width, height: 11),
                 size: 8.5, color: secondary, alignment: .center)
         }
+    }
+
+    /// В режиме Мак печатная клавиша подписывается тем, что она напечатает в
+    /// выбранной на маке раскладке (Й вместо Q); иначе — подпись из keymap.
+    private func text(_ code: KeyCode?, fallback: String?) -> String? {
+        guard mode == .mac, let code, let layout, let typed = layout.label(for: code) else {
+            return fallback
+        }
+        return typed
     }
 
     private func attributes(size: CGFloat, weight: NSFont.Weight, color: NSColor, alignment: NSTextAlignment)

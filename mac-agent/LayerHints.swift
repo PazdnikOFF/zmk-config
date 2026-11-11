@@ -380,9 +380,9 @@ final class KeyboardView: NSView {
     }
 
     /*
-     * Комбо прямо на схеме: плашка между клавишами, которые жмут вместе.
-     * Слоевые — цветом слоя под большими пальцами; выбор режима ОС — серым
-     * в стыке пары, только на том слое, где комбо работает.
+     * Комбо слоёв прямо на схеме: плашка цветом слоя под большими пальцами,
+     * которые жмут вместе. Комбо режима ОС на схеме не рисуются — владелец
+     * счёл их лишними посреди клавиатуры; они есть в строке слоёв внизу.
      */
     private func drawCombos() {
         guard let keymap else { return }
@@ -396,18 +396,6 @@ final class KeyboardView: NSView {
             drawCapsule(
                 glyph + keymap.layerName(access.layer),
                 center: NSPoint(x: union.midX, y: union.maxY + 9), fill: color)
-        }
-
-        for modeSwitch in keymap.modes ?? [] where modeSwitch.on == topLayer {
-            let frames = modeSwitch.positions.map(frame(for:))
-            guard frames.count == 2, let osMode = modeSwitch.osMode else { continue }
-            // Верхняя кромка стыка пары: подпись клавиши стоит по центру и
-            // остаётся видна.
-            let center = NSPoint(
-                x: (frames[0].midX + frames[1].midX) / 2,
-                y: max(frames[0].minY, frames[1].minY) + 8)
-            let fill: NSColor = osMode == mode ? .systemGreen : .systemGray
-            drawCapsule(osMode.title, center: center, fill: fill)
         }
     }
 

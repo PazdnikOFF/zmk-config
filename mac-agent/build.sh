@@ -33,6 +33,17 @@ printf 'APPL????' > "$APP/Contents/PkgInfo"
 # 14.0 достаточно: SMAppService требует 13.0.
 swiftc -O -target arm64-apple-macos14.0 -o "$APP/Contents/MacOS/SweepDongleAgent" *.swift
 
-codesign --force --sign - --identifier ru.pazdnikoff.sweepdongle.agent "$APP"
+# Постоянная подпись, если её завели (make-signing-identity.sh): тогда разрешения
+# macOS (Accessibility, Bluetooth, Keychain) не слетают после пересборки.
+# Иначе — ad-hoc, как раньше.
+SIGN_KEYCHAIN="$HOME/.cache/sweep-signing.keychain-db"
+SIGN_PASS="$HOME/.cache/sweep-signing.pass"
+if [[ -f "$SIGN_KEYCHAIN" && -f "$SIGN_PASS" ]]; then
+  security unlock-keychain -p "$(cat "$SIGN_PASS")" "$SIGN_KEYCHAIN"
+  codesign --force --keychain "$SIGN_KEYCHAIN" --sign "Sweep Agent Local Signing" \
+    --identifier ru.pazdnikoff.sweepdongle.agent "$APP"
+else
+  codesign --force --sign - --identifier ru.pazdnikoff.sweepdongle.agent "$APP"
+fi
 
 echo "готово: $(pwd)/$APP"

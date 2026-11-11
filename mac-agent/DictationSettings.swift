@@ -113,6 +113,7 @@ final class DictationSettings: ObservableObject {
         static let insert = "dictation.insert"
         static let paste = "dictation.paste"
         static let sounds = "dictation.sounds"
+        static let duck = "dictation.duck"
         static let broker = "dictation.broker"
         static let keyCode = "dictation.keyCode"
         static let modifiers = "dictation.modifiers"
@@ -128,6 +129,8 @@ final class DictationSettings: ObservableObject {
     @Published var insert: DictationInsert { didSet { save(insert.rawValue, Key.insert) } }
     @Published var pasteMethod: DictationPasteMethod { didSet { save(pasteMethod.rawValue, Key.paste) } }
     @Published var sounds: Bool { didSet { save(sounds, Key.sounds) } }
+    /// Громкость Mac до 1 % на время записи: колонка не слышит музыку и видео с Mac.
+    @Published var duckVolume: Bool { didSet { save(duckVolume, Key.duck) } }
     @Published var brokerAddress: String { didSet { save(brokerAddress, Key.broker) } }
     @Published var hotkey: DictationHotkey {
         didSet {
@@ -149,6 +152,7 @@ final class DictationSettings: ObservableObject {
         pasteMethod =
             DictationPasteMethod(rawValue: defaults.string(forKey: Key.paste) ?? "") ?? .clipboard
         sounds = defaults.object(forKey: Key.sounds) as? Bool ?? true
+        duckVolume = defaults.object(forKey: Key.duck) as? Bool ?? true
         brokerAddress = defaults.string(forKey: Key.broker) ?? DictationSettings.defaultBroker
         if let code = defaults.object(forKey: Key.keyCode) as? Int,
             let mods = defaults.object(forKey: Key.modifiers) as? Int

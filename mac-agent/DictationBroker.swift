@@ -92,12 +92,16 @@ final class DictationBroker: NSObject, URLSessionDataDelegate {
     }
 
     private func post(
-        _ path: String, timeout: TimeInterval,
+        _ path: String, timeout: TimeInterval, body: Data? = nil,
         completion: @escaping (Result<[String: Any], Failure>) -> Void
     ) {
-        guard let request = request(path, timeout: timeout) else {
+        guard var request = request(path, timeout: timeout) else {
             completion(.failure(.notConfigured))
             return
+        }
+        if let body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
         rpc.dataTask(with: request) { data, response, error in
             let result: Result<[String: Any], Failure>
@@ -122,8 +126,10 @@ final class DictationBroker: NSObject, URLSessionDataDelegate {
         }.resume()
     }
 
-    func start(completion: @escaping (Result<String, Failure>) -> Void) {
-        post("dictate/start", timeout: DictationBroker.startTimeout) { result in
+    /// preMs — сколько звука до нажатия брать (брокер ограничивает 0…400 мс).
+    func start(preMs: Int, completion: @escaping (Result<String, Failure>) -> Void) {
+        let body = try? JSONSerialization.data(withJSONObject: ["pre_ms": preMs])
+        post("dictate/start", timeout: DictationBroker.startTimeout, body: body) { result in
             switch result {
             case .success(let body):
                 if let sid = body["sid"] as? String, !sid.isEmpty {

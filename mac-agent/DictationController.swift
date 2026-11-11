@@ -92,6 +92,7 @@ final class DictationController {
         settings.importTokenFileIfPresent()
         settings.onChange = { [weak self] in self?.applySettings() }
         DictationSounds.prepare()
+        DictationVolume.recoverAfterCrash()
         DictationLog.write("готова, журнал \(DictationLog.url.path)")
         applySettings()
     }
@@ -192,13 +193,24 @@ final class DictationController {
         self.run = run
 
         setEscape(true)
+        /*
+         * На Mac играет звук (ролик, музыка): микрофон колонки его слышит. Тогда
+         * приглушаем сразу при нажатии и не берём звук до нажатия — иначе в текст
+         * попадает конец ролика. Звук начала при этом не слышен, но сигналом
+         * служит сам затихший звук и «Говорите» в островке.
+         * Тихо — приглушаем после звука начала, запас до нажатия — 400 мс.
+         */
+        let mediaPlaying = DictationVolume.outputIsRunning()
+        if settings.duckVolume && (mediaPlaying || !settings.sounds) { DictationVolume.duck() }
+        let preMs = mediaPlaying ? 0 : 400
         island.showRecording()
         askNotificationsOnce()
         DictationLog.write(
             run, at: run.t0,
-            "нажатие · \(run.targetName) · \(run.trigger.rawValue) · \(run.insert.rawValue) · \(settings.pasteMethod.rawValue)")
+            "нажатие · \(run.targetName) · \(run.trigger.rawValue) · \(run.insert.rawValue) · \(settings.pasteMethod.rawValue)"
+                + (mediaPlaying ? " · на Mac играет звук: запас до нажатия 0" : ""))
 
-        broker.start { [weak self] result in self?.started(run, result) }
+        broker.start(preMs: preMs) { [weak self] result in self?.started(run, result) }
     }
 
     private func started(_ run: Run, _ result: Result<String, DictationBroker.Failure>) {
@@ -232,6 +244,12 @@ final class DictationController {
             DictationLog.write(run, at: now, "колонка слушает")
             guard !run.released else { return }
             DictationSounds.playStart()
+            if settings.duckVolume && settings.sounds {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self, weak run] in
+                    guard let self, let run, self.run === run, !run.released else { return }
+                    DictationVolume.duck()
+                }
+            }
             island.setListening()
             setIndicator(.recording)
 
@@ -290,6 +308,7 @@ final class DictationController {
 
         DictationLog.write(run, at: now, "отпускание")
         setEscape(false)
+        DictationVolume.restore()
         if run.tListening != nil { DictationSounds.playStop() }
         island.showTranscribing()
         setIndicator(.transcribing)
@@ -387,6 +406,7 @@ final class DictationController {
         self.run = nil
         broker.closeEvents()
         setEscape(false)
+        DictationVolume.restore()
         setIndicator(.idle)
         if let notice {
             island.showNotice(notice, symbolName: symbol)

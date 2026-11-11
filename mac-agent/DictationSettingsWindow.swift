@@ -186,6 +186,7 @@ struct DictationSettingsView: View {
                     Text("Набор символами").tag(DictationPasteMethod.typing)
                 }
                 Toggle("Звуки начала и конца записи", isOn: $settings.sounds)
+                Toggle("Приглушать звук Mac во время записи", isOn: $settings.duckVolume)
             } header: {
                 Text("Ввод")
             } footer: {
